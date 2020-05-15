@@ -5,6 +5,9 @@
 
 using namespace std;
 
+//holds all active people
+vector<Person> ar;
+
 void move(Person& p)
 {
 	int random = 1 + (rand() % 4);
@@ -25,13 +28,19 @@ void move(Person& p)
 	}
 }
 
+void fillAr(int x, int y)
+{
+	Person p(sf::Color::Red, x, y);
+	ar.push_back(p);
+}
+
+
+
 
 int main()
 {
-	Person p(sf::Color::Red);
-	Person w(sf::Color::Magenta);
-	sf::RenderWindow window(sf::VideoMode(1280, 720), "My window");
-	
+	sf::Clock clock;
+	sf::RenderWindow window(sf::VideoMode(1280, 720), "My window");	
 
 	while (window.isOpen())
 	{
@@ -43,12 +52,26 @@ int main()
 			{
 				window.close();
 			}
+			
+			//add people on click
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			{
+				sf::Vector2i pos = sf::Mouse::getPosition(window);
+				fillAr(pos.x, pos.y);
+			}
+			
 		}
+		
 		window.clear();
-		move(p);
-		move(w);
-		window.draw(p.shape);
-		window.draw(w.shape);
+
+		if (!ar.empty()) {
+			for (auto& i : ar)
+			{
+				move(i);
+				window.draw(i.shape);
+			}
+		}
+		
 		window.display();
 
 	}

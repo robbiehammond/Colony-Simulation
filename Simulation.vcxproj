@@ -153,6 +153,9 @@
   <ItemGroup>
     <ClInclude Include="Person.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\Desktop\m3u40szpez231.jpg" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

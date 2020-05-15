@@ -6,17 +6,20 @@
 class Person
 {
 public:
-	Person(sf::Color initColor);
+	Person(sf::Color initColor, float startX, float startY);
 	sf::Color color;
+	sf::Vector2f position;
+	sf::CircleShape shape;
+
+	sf::FloatRect getPosition();
 	void moveUp();
 	void moveDown();
 	void moveRight();
 	void moveLeft();
-	sf::CircleShape shape;
+	sf::Time dt;
+
 private:
-	enum _Direction {Up, Down, Left, Right};
-	//Animation
-	sf::Time _AnimTime;
+	float speed = 0.20f;
 	
 };
 #endif
