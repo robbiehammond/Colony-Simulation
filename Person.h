@@ -19,7 +19,7 @@ public:
 	sf::Time dt;
 
 private:
-	float speed = 0.20f;
+	float speed = 0.2f;
 	
 };
 #endif
