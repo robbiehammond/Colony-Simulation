@@ -1,18 +1,35 @@
 #include <iostream>
+#include <stdlib.h>
 #include <SFML/Window.hpp>
 #include "Person.h"
 
 using namespace std;
 
-void moveTo(Person &p, int x, int y)
+void move(Person& p)
 {
-	p.shape.setPosition(x, y);
+	int random = 1 + (rand() % 4);
+	switch (random)
+	{
+	case 1:
+		p.moveUp();
+		break;
+	case 2:
+		p.moveDown();
+		break;
+	case 3:
+		p.moveLeft();
+		break;
+	case 4:
+		p.moveRight();
+		break;
+	}
 }
 
 
 int main()
 {
-	Person p(3, sf::Color::Green);
+	Person p(sf::Color::Red);
+	Person w(sf::Color::Magenta);
 	sf::RenderWindow window(sf::VideoMode(1280, 720), "My window");
 	
 
@@ -22,26 +39,18 @@ int main()
 		while (window.pollEvent(event))
 		{
 			
-			
-			if (event.type == sf::Event::KeyPressed)
-			{
-				sf::Vector2f pos = p.shape.getPosition();
-				int x = pos.x;
-				int y = pos.y;
-				moveTo(p, x + 10, y);
-				cout << x;
-			
-			}
-			
 			if (event.type == sf::Event::Closed)
 			{
 				window.close();
 			}
-			window.clear();
-			window.draw(p.shape);
-			window.display();
-			
 		}
+		window.clear();
+		move(p);
+		move(w);
+		window.draw(p.shape);
+		window.draw(w.shape);
+		window.display();
+
 	}
 	return 0;
 }

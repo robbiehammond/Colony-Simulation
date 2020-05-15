@@ -6,12 +6,17 @@
 class Person
 {
 public:
-	Person(int initRad, sf::Color initColor);
-	int rad;
-	int x;
-	int y;
+	Person(sf::Color initColor);
 	sf::Color color;
+	void moveUp();
+	void moveDown();
+	void moveRight();
+	void moveLeft();
 	sf::CircleShape shape;
+private:
+	enum _Direction {Up, Down, Left, Right};
+	//Animation
+	sf::Time _AnimTime;
 	
 };
 #endif
