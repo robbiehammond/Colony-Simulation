@@ -1,26 +1,15 @@
 #include <SFML/Graphics.hpp>
 #include "Colony.h"
 
-Colony::Colony()
+Colony::Colony(sf::Color _color)
 {
-	
-}
-
-void Colony::movePeople()
-{
-	
-}
-
-void Colony::fillArr(int x_cord, int y_cord)
-{
+	color = _color;
 	
 }
 
 
-//WILL RETURN PERSON 
-void Colony::findClosest(Person& p)
-{
-}
+
+
 
 
 

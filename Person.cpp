@@ -1,9 +1,11 @@
 #include <SFML/Graphics.hpp>
 #include "Person.h"
 
+
 using namespace std;
 
-Person::Person(sf::Color initColor, float startX, float startY)
+Person::Person(sf::Color initColor, float startX, float startY, Colony _col)
+	: myCol(_col)
 {
 	position.x = startX;
 	position.y = startY;
@@ -11,6 +13,7 @@ Person::Person(sf::Color initColor, float startX, float startY)
 	shape.setPosition(position);
 	shape.setFillColor(initColor);
 	shape.setRadius(5);
+	myCol = _col;
 }
 
 sf::FloatRect Person::getPosition()
@@ -51,6 +54,9 @@ float Person::distance(Person& other)
 {
 	return sqrt(pow(other.position.x - this->position.x, 2) + pow(other.position.y - this->position.y, 2) * 1.0);
 }
+
+
+
 
 
 
