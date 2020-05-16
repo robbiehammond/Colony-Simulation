@@ -12,6 +12,8 @@ public:
 	sf::Vector2f position;
 	sf::CircleShape shape;
 	Colony myCol;
+	//eventually add?
+	bool targetFound;
 
 	sf::FloatRect getPosition();
 	float distance(Person& other);

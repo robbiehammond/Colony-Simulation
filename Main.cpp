@@ -47,25 +47,27 @@ void fillAr(int x, int y, Colony col)
 //put this in colony class - maybe not do this on each iteration bc its costly
 //returns the position of the closest node
 Person findClose(Person& prim)
-{	
+{
 
-	
+
 	//placeholder for when the closesst is itself
 	Person placeholder(sf::Color::Red, -10000, -10000, redCol);
 
-	
-	float curMinDist = 10000;
-	
-	
+
+	float curMinDist = 500;
+
+
 	Person* saveNode = &prim;
-	
+
 	for (auto i = 0; i < ar.size(); i++)
 	{
 		const float curNodeDist = prim.distance(ar[i]);
 		if (curNodeDist < curMinDist && curNodeDist != 0)
 		{
 			curMinDist = curNodeDist;
+			prim.targetFound = true;
 			saveNode = &ar[i];
+			break;
 		}
 	}
 	//cout << saveNode->position.x - prim.position.x << " " << saveNode->position.y - prim.position.y << endl;
@@ -74,6 +76,7 @@ Person findClose(Person& prim)
 	else
 		return *saveNode;
 }
+
 
 
 
@@ -106,7 +109,7 @@ void detectColision(Person& prim)
 	if (prim.shape.getGlobalBounds().intersects(closest.shape.getGlobalBounds()) && closest.shape.getPosition() != prim.shape.getPosition())
 	{
 		cout << "collision" << endl;
-	}	
+	}
 }
 
 
@@ -116,7 +119,7 @@ void detectColision(Person& prim)
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(1280, 720), "My window");	
+	sf::RenderWindow window(sf::VideoMode(1280, 720), "My window");
 
 
 	sf::Clock r;
@@ -128,12 +131,12 @@ int main()
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
-			
+
 			if (event.type == sf::Event::Closed)
 			{
 				window.close();
 			}
-			
+
 			//make it so when clicked off screen, nothing happens
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
@@ -150,27 +153,27 @@ int main()
 				sf::Vector2i pos = sf::Mouse::getPosition(window);
 				fillAr(pos.x, pos.y, blueCol);
 			}
-			
-			
+
+
 		}
 		window.clear();
 
 
 
-		
+
 		if (!ar.empty()) {
 			for (auto& i : ar)
 			{
-				
-				if (elapsed_time.asMilliseconds() % 50 == 0) {
+
+				if (elapsed_time.asMilliseconds() % 100 == 0) {
 					moveNode(i);
 				}
-				
+
 				move(i);
 				window.draw(i.shape);
 			}
 		}
-		
+
 		window.display();
 
 	}
