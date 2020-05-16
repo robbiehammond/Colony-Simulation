@@ -12,6 +12,7 @@ public:
 	sf::CircleShape shape;
 
 	sf::FloatRect getPosition();
+	float distance(Person& other);
 	void moveUp();
 	void moveDown();
 	void moveRight();

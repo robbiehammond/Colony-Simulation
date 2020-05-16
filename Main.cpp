@@ -34,23 +34,27 @@ void fillAr(int x, int y)
 	ar.push_back(p);
 }
 
+
+
+
+
 //put this in colony class - maybe not do this on each iteration bc its costly
 void findClose(Person& prim)
 {
 	vector<sf::Vector2f> locations;
 	sf::Vector2f vec;
+	float curMinDist = 10000;
+	int saveNodeNumber = 0;
 	for (int i = 0; i < ar.size(); i++)
 	{
-		sf::Vector2f vec = ar[i].position;
-		locations.push_back(vec);
+		float curNodeDist = prim.distance(ar[i]);
+		if (curNodeDist < curMinDist && curNodeDist != 0)
+		{
+			curMinDist = curNodeDist;
+			saveNodeNumber = i;
+		}
 	}
-	/*
-	for (int i = 0; i < locations.size(); i++)
-	{
-		cout << locations[i].x << " " << locations[i].y << "\t";
-	}
-	cout << endl;
-	*/
+	cout << "Person " << saveNodeNumber << "is closest at distance " << curMinDist << "from the input node" << endl;
 }
 
 
@@ -58,6 +62,7 @@ int main()
 {
 	Person p(sf::Color::Green, 100, 100);
 	ar.push_back(p);
+
 	sf::RenderWindow window(sf::VideoMode(1280, 720), "My window");	
 
 	while (window.isOpen())
@@ -71,7 +76,7 @@ int main()
 				window.close();
 			}
 			
-			//add people on click
+			//make it so when clicked off screen, nothing happens
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
 				sf::Vector2i pos = sf::Mouse::getPosition(window);
@@ -81,9 +86,7 @@ int main()
 		}
 		window.clear();
 
-		
-
-		findClose(p);
+		findClose(ar[0]);
 		
 		if (!ar.empty()) {
 			for (auto& i : ar)

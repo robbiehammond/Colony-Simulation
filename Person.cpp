@@ -46,3 +46,11 @@ void Person::moveRight()
 	shape.setPosition(position);
 }
 
+
+float Person::distance(Person& other)
+{
+	return sqrt(pow(other.position.x - this->position.x, 2) + pow(other.position.y - this->position.y, 2) * 1.0);
+}
+
+
+
