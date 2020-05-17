@@ -8,6 +8,7 @@ using namespace std;
 
 //holds all active people
 vector<Person> ar;
+
 Colony redCol(sf::Color::Red);
 Colony greenCol(sf::Color::Green);
 Colony blueCol(sf::Color::Blue);
@@ -37,7 +38,7 @@ void move(Person& p)
 
 void fillAr(int x, int y, Colony col)
 {
-	Person p(col.color, x, y, col);
+	Person p(x, y, col);
 	ar.push_back(p);
 }
 
@@ -52,7 +53,7 @@ Person findClose(Person& prim)
 
 
 	//placeholder for when the closesst is itself
-	Person placeholder(sf::Color::Cyan, -10000, -10000, placehold);
+	Person placeholder(-10000, -10000, placehold);
 
 
 	float curMinDist = 500;
@@ -65,13 +66,10 @@ Person findClose(Person& prim)
 		const float curNodeDist = prim.distance(ar[i]);
 		if (curNodeDist < curMinDist && curNodeDist != 0)
 		{
-			curMinDist = curNodeDist;
-
 			saveNode = &ar[i];
 			break;
 		}
 	}
-	//cout << saveNode->position.x - prim.position.x << " " << saveNode->position.y - prim.position.y << endl;
 	if (saveNode->shape.getPosition() == prim.shape.getPosition())
 		return placeholder;
 	else
@@ -91,7 +89,7 @@ void moveNode(Person& prim)
 		int dy = closest.position.y - prim.position.y;
 
 		int i = 0;
-		while (i < 5) {
+		while (i < 3) {
 			if (dx > 0)
 				prim.moveRight();
 			if (dx < 0)
@@ -117,12 +115,19 @@ void moveNode(Person& prim)
 
 void mutate(Person& person)
 {
+	
 	int random = 1 + (rand() % 1000);
+	//mutation 1: get bigger
 	if (random == 500)
 	{
-		person.radius = person.radius * 2;
-		person.shape.setRadius(person.radius * 2);
+		person.updateRadius(person.radius + 2);
+		person.shape.setRadius(person.radius);
 	}
+}
+
+void reproduce(Person& parent)
+{
+	
 }
 
 
@@ -200,6 +205,6 @@ int main()
 		if (elapsed_time.asMilliseconds() % 200)
 			random_shuffle(ar.begin(), ar.end());
 	}
-	cout << ar.size();
+	cout << "Amount of people left: " << ar.size();
 	return 0;
 }

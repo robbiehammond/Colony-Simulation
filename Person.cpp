@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Person::Person(sf::Color initColor, float startX, float startY, Colony _col)
+Person::Person(float startX, float startY, Colony _col)
 	: myCol(_col)
 {
 	radius = 5;
@@ -12,9 +12,9 @@ Person::Person(sf::Color initColor, float startX, float startY, Colony _col)
 	damage = 1;
 	position.x = startX;
 	position.y = startY;
-	color = initColor;
+	color = myCol.color;
 	shape.setPosition(position);
-	shape.setFillColor(initColor);
+	shape.setFillColor(color);
 	shape.setRadius(radius);
 	myCol = _col;
 }
@@ -55,6 +55,11 @@ void Person::moveRight()
 float Person::distance(Person& other)
 {
 	return sqrt(pow(other.position.x - this->position.x, 2) + pow(other.position.y - this->position.y, 2) * 1.0);
+}
+
+void Person::updateRadius(float _radius)
+{
+	radius = _radius;
 }
 
 
