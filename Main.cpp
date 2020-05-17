@@ -3,6 +3,7 @@
 #include <SFML/Window.hpp>
 #include "Person.h"
 #include "Colony.h"
+#include "Map.h"
 
 using namespace std;
 
@@ -12,6 +13,7 @@ vector<Person> ar;
 Colony redCol(sf::Color::Red);
 Colony greenCol(sf::Color::Green);
 Colony blueCol(sf::Color::Blue);
+Map map(Map1);
 Colony placehold(sf::Color::Cyan);
 
 
@@ -39,7 +41,10 @@ void move(Person& p)
 void fillAr(int x, int y, Colony col)
 {
 	Person p(x, y, col);
-	ar.push_back(p);
+	//make sure they're being filled in a correct map range
+	if (p.checkBounds(p.position.x, p.position.y)) {
+		ar.push_back(p);
+	}
 }
 
 
@@ -117,7 +122,7 @@ void mutate(Person& person)
 	//mutation 1: get bigger
 	if (random == 500)
 	{
-		person.updateRadius(person.radius + 2);
+		person.updateRadius(person.radius + 1);
 		person.shape.setRadius(person.radius);
 	}
 }
@@ -199,7 +204,7 @@ int main()
 					Person p = findClose(i);
 					mutate(i);
 					moveNode(i, p);
-					//reproduce(i, p);
+					//reproduce(i, p); prolly get rid of later
 				}
 				move(i);
 				window.draw(i.shape);

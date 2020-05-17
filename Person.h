@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "Colony.h"
+#include "Map.h"
 #ifndef PERSON
 #define PERSON
 
@@ -22,6 +23,7 @@ public:
 	int health;
 	float speed = 0.2f;
 	int damage;
+	Map curMap;
 
 	sf::FloatRect getPosition();
 	float distance(Person& other);
@@ -30,6 +32,7 @@ public:
 	void moveRight();
 	void moveLeft();
 	void updateRadius(float radius);
+	bool checkBounds(float x, float y);
 
 private:
 
