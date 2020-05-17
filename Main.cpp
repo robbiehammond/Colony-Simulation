@@ -11,6 +11,7 @@ vector<Person> ar;
 Colony redCol(sf::Color::Red);
 Colony greenCol(sf::Color::Green);
 Colony blueCol(sf::Color::Blue);
+Colony placehold(sf::Color::Cyan);
 
 
 
@@ -51,7 +52,7 @@ Person findClose(Person& prim)
 
 
 	//placeholder for when the closesst is itself
-	Person placeholder(sf::Color::Red, -10000, -10000, redCol);
+	Person placeholder(sf::Color::Cyan, -10000, -10000, placehold);
 
 
 	float curMinDist = 500;
@@ -65,7 +66,7 @@ Person findClose(Person& prim)
 		if (curNodeDist < curMinDist && curNodeDist != 0)
 		{
 			curMinDist = curNodeDist;
-			prim.targetFound = true;
+
 			saveNode = &ar[i];
 			break;
 		}
@@ -85,33 +86,44 @@ void moveNode(Person& prim)
 {
 	Person closest = findClose(prim);
 	float dist = prim.distance(closest);
-	if (dist != 0 && dist < 1000 && prim.myCol.color != closest.myCol.color) {
+	if (dist != 0 && dist < 1000 && prim.myCol.color != closest.myCol.color && closest.color != sf::Color::Transparent) {
 		int dx = closest.position.x - prim.position.x;
 		int dy = closest.position.y - prim.position.y;
 
-		if (dx > 0)
-			prim.moveRight();
-		if (dx < 0)
-			prim.moveLeft();
-		if (dy > 0)
-			prim.moveDown();
-		if (dy < 0)
-			prim.moveUp();
+		int i = 0;
+		while (i < 5) {
+			if (dx > 0)
+				prim.moveRight();
+			if (dx < 0)
+				prim.moveLeft();
+			if (dy > 0)
+				prim.moveDown();
+			if (dy < 0)
+				prim.moveUp();
+			//collision detection
+			if (prim.shape.getGlobalBounds().intersects(closest.shape.getGlobalBounds()) && closest.shape.getPosition() != prim.shape.getPosition())
+			{
+				prim.health -= closest.damage;
+				closest.health -= 1;
+			}
+			i++;
+		}
 	}
 }
 
 
 
-void detectColision(Person& prim)
+
+
+void mutate(Person& person)
 {
-
-	Person closest = findClose(prim);
-	if (prim.shape.getGlobalBounds().intersects(closest.shape.getGlobalBounds()) && closest.shape.getPosition() != prim.shape.getPosition())
+	int random = 1 + (rand() % 1000);
+	if (random == 500)
 	{
-		cout << "collision" << endl;
+		person.radius = person.radius * 2;
+		person.shape.setRadius(person.radius * 2);
 	}
 }
-
 
 
 
@@ -136,22 +148,23 @@ int main()
 			{
 				window.close();
 			}
-
-			//make it so when clicked off screen, nothing happens
-			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-			{
-				sf::Vector2i pos = sf::Mouse::getPosition(window);
-				fillAr(pos.x, pos.y, redCol);
-			}
-			if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
-			{
-				sf::Vector2i pos = sf::Mouse::getPosition(window);
-				fillAr(pos.x, pos.y, greenCol);
-			}
-			if (sf::Mouse::isButtonPressed(sf::Mouse::Middle))
-			{
-				sf::Vector2i pos = sf::Mouse::getPosition(window);
-				fillAr(pos.x, pos.y, blueCol);
+			if (ar.size() <= 1250) {
+				//make it so when clicked off screen, nothing happens
+				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+				{
+					sf::Vector2i pos = sf::Mouse::getPosition(window);
+					fillAr(pos.x, pos.y, redCol);
+				}
+				if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
+				{
+					sf::Vector2i pos = sf::Mouse::getPosition(window);
+					fillAr(pos.x, pos.y, greenCol);
+				}
+				if (sf::Mouse::isButtonPressed(sf::Mouse::Middle))
+				{
+					sf::Vector2i pos = sf::Mouse::getPosition(window);
+					fillAr(pos.x, pos.y, blueCol);
+				}
 			}
 
 
@@ -160,15 +173,13 @@ int main()
 
 
 
-
 		if (!ar.empty()) {
 			for (auto& i : ar)
 			{
-
 				if (elapsed_time.asMilliseconds() % 100 == 0) {
+					mutate(i);
 					moveNode(i);
 				}
-
 				move(i);
 				window.draw(i.shape);
 			}
@@ -176,6 +187,19 @@ int main()
 
 		window.display();
 
+		//after the display
+		int size = ar.size();
+		for (int i = 0; i < size; i++)
+		{
+			if (ar[i].health <= 0)
+			{
+				ar.erase(ar.begin() + i);
+				size = ar.size();
+			}
+		}
+		if (elapsed_time.asMilliseconds() % 200)
+			random_shuffle(ar.begin(), ar.end());
 	}
+	cout << ar.size();
 	return 0;
 }

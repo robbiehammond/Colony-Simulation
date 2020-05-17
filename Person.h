@@ -13,7 +13,11 @@ public:
 	sf::CircleShape shape;
 	Colony myCol;
 	//eventually add?
-	bool targetFound;
+	//bool targetFound;
+	int radius;
+	int health;
+	float speed = 0.2f;
+	int damage;
 
 	sf::FloatRect getPosition();
 	float distance(Person& other);
@@ -21,11 +25,10 @@ public:
 	void moveDown();
 	void moveRight();
 	void moveLeft();
-	void assignColony();
 	
 
 private:
-	float speed = 0.2f;
+
 	
 };
 #endif
