@@ -38,9 +38,11 @@ void Person::moveUp()
 		position.y -= speed;
 		shape.setPosition(position);
 	}
-	else
-	{
-		shape.setPosition(position);
+
+		while (!checkBounds(position.x, position.y)) {
+			position.y += speed;
+			shape.setPosition(position);
+		
 	}
 }
 
@@ -52,9 +54,11 @@ void Person::moveDown()
 		position.y += speed;
 		shape.setPosition(position);
 	}
-	else
-	{
-		shape.setPosition(position);
+	
+		while (!checkBounds(position.x, position.y)) {
+			position.y -= speed;
+			shape.setPosition(position);
+		
 	}
 }
 
@@ -66,9 +70,11 @@ void Person::moveLeft()
 		position.x -= speed;
 		shape.setPosition(position);
 	}
-	else
-	{
-		shape.setPosition(position);
+	
+		while (!checkBounds(position.x, position.y)) {
+			position.x += speed;
+			shape.setPosition(position);
+		
 	}
 }
 
@@ -81,9 +87,11 @@ void Person::moveRight()
 		position.x += speed;
 		shape.setPosition(position);
 	}
-	else
-	{
-		shape.setPosition(position);
+	
+		while (!checkBounds(position.x, position.y)) {
+			position.x -= speed;
+			shape.setPosition(position);
+		
 	}
 }
 
@@ -107,7 +115,7 @@ bool Person::checkBounds(float x, float y)
 	switch (map)
 	{
 	case Map1:
-		if (x_coord > std::get<0>(curMap.x_restriction) && x_coord < std::get<1>(curMap.x_restriction) && y_coord > std::get<0>(curMap.y_restriction) && y_coord < std::get<1>(curMap.y_restriction)) {
+		if (x_coord >= std::get<0>(curMap.x_restriction) && x_coord <= std::get<1>(curMap.x_restriction) && y_coord >= std::get<0>(curMap.y_restriction) && y_coord <= std::get<1>(curMap.y_restriction)) {
 			return false;
 		}
 		return true;

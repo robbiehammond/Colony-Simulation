@@ -87,12 +87,13 @@ void moveNode(Person& prim, Person& closest)
 {
 	float dist = prim.distance(closest);
 	if (dist != 0 && dist < 1000 && prim.myCol.color != closest.myCol.color) {
-		int dx = closest.position.x - prim.position.x;
-		int dy = closest.position.y - prim.position.y;
+	
 
 		int i = 0;
 		while (i < 3) {
-			if (dx > 0)
+			float dx = closest.position.x - prim.position.x;
+			float dy = closest.position.y - prim.position.y;
+			if (dx > 0) 
 				prim.moveRight();
 			if (dx < 0)
 				prim.moveLeft();
