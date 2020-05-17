@@ -112,18 +112,23 @@ bool Person::checkBounds(float x, float y)
 	float x_coord = position.x;
 	float y_coord = position.y;
 	MapSelection map = curMap.m;
-	switch (map)
-	{
-	case Map1:
-		if (x_coord >= std::get<0>(curMap.x_restriction) && x_coord <= std::get<1>(curMap.x_restriction) && y_coord >= std::get<0>(curMap.y_restriction) && y_coord <= std::get<1>(curMap.y_restriction)) {
-			return false;
+
+	//only need to loop through x_restrictions, because x and y restrictions are the same size
+	for (int i = 0; i < curMap.x_restrictions.size(); i++) {
+		switch (map)
+		{
+		case Map1:
+			if (x_coord >= std::get<0>(curMap.x_restrictions[i]) && x_coord <= std::get<1>(curMap.x_restrictions[i]) && y_coord >= std::get<0>(curMap.y_restrictions[i]) && y_coord <= std::get<1>(curMap.y_restrictions[i])) {
+				return false;
+			}
+			break;
+		case Map2:
+			break;
+		case Map3:
+			break;
+		default:
+			return true;
 		}
-		return true;
-		break;
-	case Map2:
-		break;
-	case Map3:
-		break;
 	}
 }
 

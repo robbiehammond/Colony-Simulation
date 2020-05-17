@@ -10,8 +10,12 @@ Map::Map(const MapSelection _m)
 
 void Map::setRestrictions()
 {
-	x_restriction = make_tuple(100, 200);
-	y_restriction = make_tuple(100, 200);
+	if (m == Map1) {
+		x_restriction = make_tuple(100, 200);
+		y_restriction = make_tuple(100, 200);
+		x_restrictions.push_back(x_restriction);
+		y_restrictions.push_back(y_restriction);
+	}
 	/*
 	switch (m)
 	{
