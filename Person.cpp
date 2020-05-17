@@ -7,6 +7,7 @@ using namespace std;
 Person::Person(float startX, float startY, Colony _col)
 	: myCol(_col)
 {
+	found = false;
 	radius = 5;
 	health = 10;
 	damage = 1;

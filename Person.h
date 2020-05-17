@@ -8,11 +8,13 @@ class Person
 {
 public:
 	Person(float startX, float startY, Colony _col);
-	//add a field for a person that's been found by this person
 	sf::Color color;
 	sf::Vector2f position;
 	sf::CircleShape shape;
+	
 	Colony myCol;
+	//do something with this
+	bool found;
 	//eventually add?
 	//bool targetFound;
 	//add a "can move" variable based on the map - maybe just a list of valid coordinates

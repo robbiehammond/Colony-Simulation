@@ -46,12 +46,9 @@ void fillAr(int x, int y, Colony col)
 
 
 //TODO Make a better algorithm for finding closest other node 
-//put this in colony class - maybe not do this on each iteration bc its costly
-//returns the position of the closest node
+//returns a close node
 Person findClose(Person& prim)
 {
-
-
 	//placeholder for when the closesst is itself
 	Person placeholder(-10000, -10000, placehold);
 
@@ -70,8 +67,9 @@ Person findClose(Person& prim)
 			break;
 		}
 	}
-	if (saveNode->shape.getPosition() == prim.shape.getPosition())
+	if (saveNode->shape.getPosition() == prim.shape.getPosition()) {
 		return placeholder;
+	}
 	else
 		return *saveNode;
 }
@@ -80,11 +78,10 @@ Person findClose(Person& prim)
 
 
 //this works surprisingly well
-void moveNode(Person& prim)
+void moveNode(Person& prim, Person& closest)
 {
-	Person closest = findClose(prim);
 	float dist = prim.distance(closest);
-	if (dist != 0 && dist < 1000 && prim.myCol.color != closest.myCol.color && closest.color != sf::Color::Transparent) {
+	if (dist != 0 && dist < 1000 && prim.myCol.color != closest.myCol.color) {
 		int dx = closest.position.x - prim.position.x;
 		int dy = closest.position.y - prim.position.y;
 
@@ -125,9 +122,21 @@ void mutate(Person& person)
 	}
 }
 
-void reproduce(Person& parent)
+
+//will return a person, or just add a person to the end of the array
+//Currently breaks everything, might leave out if it does
+void reproduce(Person& parent, Person& closest)
 {
-	
+	if (ar.size() > 50) {
+		int random = 1 + (rand() % 500);
+		if (random == 5)
+		{
+			Person* p = new Person(parent.position.x, parent.position.y, parent.myCol);
+			ar.push_back(*p);
+			delete p;
+			cout << "Reproduction happens!" << endl;
+		}
+	}
 }
 
 
@@ -140,7 +149,6 @@ int main()
 
 
 	sf::Clock r;
-	sf::Time delta_time = sf::milliseconds(1000);
 	sf::Time elapsed_time;
 	while (window.isOpen())
 	{
@@ -171,19 +179,27 @@ int main()
 					fillAr(pos.x, pos.y, blueCol);
 				}
 			}
+			if (event.type == sf::Event::KeyPressed)
+			{
+				if (event.key.code == sf::Keyboard::A)
+				{
+					cout << ar.size();
+				}
+			}
 
 
 		}
 		window.clear();
 
 
-
 		if (!ar.empty()) {
 			for (auto& i : ar)
 			{
 				if (elapsed_time.asMilliseconds() % 100 == 0) {
+					Person p = findClose(i);
 					mutate(i);
-					moveNode(i);
+					moveNode(i, p);
+					//reproduce(i, p);
 				}
 				move(i);
 				window.draw(i.shape);
