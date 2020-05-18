@@ -8,7 +8,7 @@
 class Person
 {
 public:
-	Person(float startX, float startY, Colony _col);
+	Person(float startX, float startY, Colony _col, Map _curMap);
 	sf::Color color;
 	sf::Vector2f position;
 	sf::CircleShape shape;
@@ -33,6 +33,7 @@ public:
 	void moveLeft();
 	void updateRadius(float radius);
 	bool checkBounds(float x, float y);
+	//make random animal spawns (just to get their positions different)
 
 private:
 

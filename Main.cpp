@@ -10,10 +10,11 @@ using namespace std;
 //holds all active people
 vector<Person> ar;
 
+
 Colony redCol(sf::Color::Red);
 Colony greenCol(sf::Color::Green);
 Colony blueCol(sf::Color::Blue);
-Map map(Map1);
+Map theMap(Map1);
 Colony placehold(sf::Color::Cyan);
 
 
@@ -40,7 +41,7 @@ void move(Person& p)
 
 void fillAr(int x, int y, Colony col)
 {
-	Person p(x, y, col);
+	Person p(x, y, col, theMap.m);
 	//make sure they're being filled in a correct map range
 	if (p.checkBounds(p.position.x, p.position.y)) {
 		ar.push_back(p);
@@ -51,14 +52,13 @@ void fillAr(int x, int y, Colony col)
 
 
 //TODO Make a better algorithm for finding closest other node 
-//returns a close node
 Person findClose(Person& prim)
 {
 	//placeholder for when the closesst is itself
-	Person placeholder(-10000, -10000, placehold);
+	Person placeholder(-10000, -10000, placehold, theMap.m);
 
 
-	float curMinDist = 500;
+	float curMinDist = 400;
 
 
 	Person* saveNode = &prim;
@@ -137,7 +137,7 @@ void reproduce(Person& parent, Person& closest)
 		int random = 1 + (rand() % 500);
 		if (random == 5)
 		{
-			Person* p = new Person(parent.position.x, parent.position.y, parent.myCol);
+			Person* p = new Person(parent.position.x, parent.position.y, parent.myCol, theMap.m);
 			ar.push_back(*p);
 			delete p;
 			cout << "Reproduction happens!" << endl;

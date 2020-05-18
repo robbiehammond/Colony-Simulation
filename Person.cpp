@@ -6,11 +6,11 @@
 
 using namespace std;
 
-Person::Person(float startX, float startY, Colony _col)
-	: myCol(_col), curMap(Map1)
+Person::Person(float startX, float startY, Colony _col, Map _curMap)
+	: myCol(_col), curMap(_curMap.m)
 {
 	found = false;
-	radius = 5;
+	radius = 10;
 	health = 10;
 	damage = 1;
 	position.x = startX;
@@ -28,7 +28,7 @@ sf::FloatRect Person::getPosition()
 }
 
 
-//Fix push-back from walls, but they're generally working
+//checking the same bounds twice here, do it only once by using a variable
 void Person::moveUp()
 {
 	//if they can move there (map.can move)
@@ -38,10 +38,15 @@ void Person::moveUp()
 		position.y -= speed;
 		shape.setPosition(position);
 	}
+	if (!checkBounds(position.x, temp))
+	{
+		position.x += speed;
+		shape.setPosition(position);
+	}
 
-		while (!checkBounds(position.x, position.y)) {
-			position.y += speed;
-			shape.setPosition(position);
+	while (!checkBounds(position.x, position.y)) {
+		position.y += speed;
+		shape.setPosition(position);
 		
 	}
 }
@@ -54,10 +59,15 @@ void Person::moveDown()
 		position.y += speed;
 		shape.setPosition(position);
 	}
+	if (!checkBounds(position.x, temp))
+	{
+		position.x -= speed;
+		shape.setPosition(position);
+	}
 	
-		while (!checkBounds(position.x, position.y)) {
-			position.y -= speed;
-			shape.setPosition(position);
+	while (!checkBounds(position.x, position.y)) {
+		position.y -= speed;
+		shape.setPosition(position);
 		
 	}
 }
@@ -70,10 +80,15 @@ void Person::moveLeft()
 		position.x -= speed;
 		shape.setPosition(position);
 	}
+	if (!checkBounds(temp, position.y))
+	{
+		position.y -= speed;
+		shape.setPosition(position);
+	}
 	
-		while (!checkBounds(position.x, position.y)) {
-			position.x += speed;
-			shape.setPosition(position);
+	while (!checkBounds(position.x, position.y)) {
+		position.x += speed;
+		shape.setPosition(position);
 		
 	}
 }
@@ -87,10 +102,15 @@ void Person::moveRight()
 		position.x += speed;
 		shape.setPosition(position);
 	}
-	
-		while (!checkBounds(position.x, position.y)) {
-			position.x -= speed;
-			shape.setPosition(position);
+	if (!checkBounds(temp,position.y))
+	{
+		position.y += speed;
+		shape.setPosition(position);
+	}
+		
+	while (!checkBounds(position.x, position.y)) {
+		position.x -= speed;
+		shape.setPosition(position);
 		
 	}
 }
@@ -131,10 +151,6 @@ bool Person::checkBounds(float x, float y)
 		}
 	}
 }
-
-
-
-
 
 
 
