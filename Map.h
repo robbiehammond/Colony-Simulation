@@ -18,10 +18,10 @@ class Map
 public:
 	Map( MapSelection _m);
 	MapSelection m;
-	min_max x_restriction;
-	min_max y_restriction;
 	vector<min_max> x_restrictions;
 	vector<min_max> y_restrictions;
-
+private:
+	min_max x_restriction;
+	min_max y_restriction;
 	void setRestrictions();
 };

@@ -1,18 +1,18 @@
 #include <SFML/Graphics.hpp>
 #include "Person.h"
-
 #include <iostream>
-
-
 using namespace std;
 
 Person::Person(float startX, float startY, Colony _col, Map _curMap)
 	: myCol(_col), curMap(_curMap.m)
 {
 	found = false;
+
+	//these are mutatable
 	radius = 10;
 	health = 10;
 	damage = 1;
+	
 	position.x = startX;
 	position.y = startY;
 	color = myCol.color;
@@ -31,19 +31,21 @@ sf::FloatRect Person::getPosition()
 //checking the same bounds twice here, do it only once by using a variable
 void Person::moveUp()
 {
-	//if they can move there (map.can move)
 	float temp = position.y;
 	temp -= speed;
-	if (checkBounds(position.x, temp)) {
+	//check if where they're trying to move is a valid position
+	if (checkBounds(position.x, temp))
+	{
 		position.y -= speed;
 		shape.setPosition(position);
 	}
+	//if it's not, push them backwards
 	if (!checkBounds(position.x, temp))
 	{
 		position.x += speed;
 		shape.setPosition(position);
 	}
-
+	//so they don't get stuck, move them in a perpendicular direction as well
 	while (!checkBounds(position.x, position.y)) {
 		position.y += speed;
 		shape.setPosition(position);
@@ -151,7 +153,3 @@ bool Person::checkBounds(float x, float y)
 		}
 	}
 }
-
-
-
-

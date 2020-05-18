@@ -19,7 +19,7 @@ public:
 	//eventually add?
 	//bool targetFound;
 	//add a "can move" variable based on the map - maybe just a list of valid coordinates
-	int radius;
+	float radius;
 	int health;
 	float speed = 0.2f;
 	int damage;

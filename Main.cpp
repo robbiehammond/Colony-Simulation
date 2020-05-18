@@ -10,15 +10,19 @@ using namespace std;
 //holds all active people
 vector<Person> ar;
 
+//the selected map
+Map theMap(Map1);
 
+//colonies
 Colony redCol(sf::Color::Red);
 Colony greenCol(sf::Color::Green);
 Colony blueCol(sf::Color::Blue);
-Map theMap(Map1);
 Colony placehold(sf::Color::Cyan);
 
 
 
+
+//moves a person in a random direction
 void move(Person& p)
 {
 	int random = 1 + (rand() % 4);
@@ -39,6 +43,7 @@ void move(Person& p)
 	}
 }
 
+//puts a new person on the screen
 void fillAr(int x, int y, Colony col)
 {
 	Person p(x, y, col, theMap.m);
@@ -51,7 +56,8 @@ void fillAr(int x, int y, Colony col)
 
 
 
-//TODO Make a better algorithm for finding closest other node 
+//Finds a close enemy
+//Probably can be implemented better
 Person findClose(Person& prim)
 {
 	//placeholder for when the closesst is itself
@@ -82,7 +88,7 @@ Person findClose(Person& prim)
 
 
 
-//this works surprisingly well
+//moves node towards a close node
 void moveNode(Person& prim, Person& closest)
 {
 	float dist = prim.distance(closest);
@@ -115,7 +121,7 @@ void moveNode(Person& prim, Person& closest)
 
 
 
-
+//changes a persons' stats at random
 void mutate(Person& person)
 {
 	
@@ -128,76 +134,63 @@ void mutate(Person& person)
 	}
 }
 
-
-//will return a person, or just add a person to the end of the array
-//Currently breaks everything, might leave out if it does
-void reproduce(Person& parent, Person& closest)
+//throw all input stuff here
+void getUserInput(sf::RenderWindow& window, sf::Event& event)
 {
-	if (ar.size() > 50) {
-		int random = 1 + (rand() % 500);
-		if (random == 5)
+	if (event.type == sf::Event::Closed)
+	{
+		window.close();
+	}
+	
+	if (ar.size() <= 1250) {
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
-			Person* p = new Person(parent.position.x, parent.position.y, parent.myCol, theMap.m);
-			ar.push_back(*p);
-			delete p;
-			cout << "Reproduction happens!" << endl;
+			sf::Vector2i pos = sf::Mouse::getPosition(window);
+			fillAr(pos.x, pos.y, redCol);
+		}
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
+		{
+			sf::Vector2i pos = sf::Mouse::getPosition(window);
+			fillAr(pos.x, pos.y, greenCol);
+		}
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Middle))
+		{
+			sf::Vector2i pos = sf::Mouse::getPosition(window);
+			fillAr(pos.x, pos.y, blueCol);
+		}
+	}
+	
+	if (event.type == sf::Event::KeyPressed)
+	{
+		if (event.key.code == sf::Keyboard::A)
+		{
+			cout << ar.size();
 		}
 	}
 }
-
-
-
 
 
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1280, 720), "My window");
 
-
 	sf::Clock r;
 	sf::Time elapsed_time;
+	
 	while (window.isOpen())
 	{
+		
 		elapsed_time += r.restart();
 		sf::Event event;
+		
 		while (window.pollEvent(event))
 		{
-
-			if (event.type == sf::Event::Closed)
-			{
-				window.close();
-			}
-			if (ar.size() <= 1250) {
-				//make it so when clicked off screen, nothing happens
-				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-				{
-					sf::Vector2i pos = sf::Mouse::getPosition(window);
-					fillAr(pos.x, pos.y, redCol);
-				}
-				if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
-				{
-					sf::Vector2i pos = sf::Mouse::getPosition(window);
-					fillAr(pos.x, pos.y, greenCol);
-				}
-				if (sf::Mouse::isButtonPressed(sf::Mouse::Middle))
-				{
-					sf::Vector2i pos = sf::Mouse::getPosition(window);
-					fillAr(pos.x, pos.y, blueCol);
-				}
-			}
-			if (event.type == sf::Event::KeyPressed)
-			{
-				if (event.key.code == sf::Keyboard::A)
-				{
-					cout << ar.size();
-				}
-			}
-
-
+			getUserInput(window, event);
 		}
+		
 		window.clear();
 
-
+		//update game 
 		if (!ar.empty()) {
 			for (auto& i : ar)
 			{
@@ -205,7 +198,6 @@ int main()
 					Person p = findClose(i);
 					mutate(i);
 					moveNode(i, p);
-					//reproduce(i, p); prolly get rid of later
 				}
 				move(i);
 				window.draw(i.shape);
@@ -227,6 +219,7 @@ int main()
 		if (elapsed_time.asMilliseconds() % 200)
 			random_shuffle(ar.begin(), ar.end());
 	}
+	//on close 
 	cout << "Amount of people left: " << ar.size();
 	return 0;
 }

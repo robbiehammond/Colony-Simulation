@@ -12,6 +12,9 @@ Map::Map(const MapSelection _m)
 
 void Map::setRestrictions()
 {
+
+	//before switch, put bounds that are the same for every map (ie edge boundaries)
+	
 	switch (m) {
 	case Map1:
 		//top left square
@@ -45,19 +48,4 @@ void Map::setRestrictions()
 	default:
 		std::cout << "We got problems" << endl;
 	}
-	/*
-	switch (m)
-	{
-	case Map1:
-		min_max xRestrict = make_tuple(100, 200);
-		min_max yRestrict = make_tuple(100, 200);
-		break;
-	case Map2:
-		break;
-	case Map3:
-		break;
-	default:
-		break;
-	}
-	*/
 }
