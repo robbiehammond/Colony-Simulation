@@ -197,6 +197,32 @@ int main()
 
 	
 	//main menu
+	//map selections - fill them in with images later
+	sf::RectangleShape map0(sf::Vector2f(100, 100));
+	map0.setPosition(400, 100);
+	map0.setOutlineColor(sf::Color::White);
+	map0.setOutlineThickness(2);
+	map0.setFillColor(sf::Color::Black);
+	
+
+	sf::RectangleShape map1(sf::Vector2f(100, 100));
+	map1.setPosition(780, 100);
+	map1.setOutlineColor(sf::Color::White);
+	map1.setOutlineThickness(2);
+	map1.setFillColor(sf::Color::Black);
+
+	sf::RectangleShape map2(sf::Vector2f(100, 100));
+	map2.setPosition(400, 300);
+	map2.setOutlineColor(sf::Color::White);
+	map2.setOutlineThickness(2);
+	map2.setFillColor(sf::Color::Black);
+
+	sf::RectangleShape map3(sf::Vector2f(100, 100));
+	map3.setPosition(780, 300);
+	map3.setOutlineColor(sf::Color::White);
+	map3.setOutlineThickness(2);
+	map3.setFillColor(sf::Color::Black);
+
 	
 	//sandbox mode button
 	sf::RectangleShape sbutton(sf::Vector2f(270, 50));
@@ -211,8 +237,9 @@ int main()
 	bbutton.setOutlineColor(sf::Color::Green);
 	bbutton.setOutlineThickness(2);
 	bbutton.setFillColor(sf::Color::Black);
-	
 
+
+	
 	
 	sf::Font font;
 	font.loadFromFile("arial.ttf");
@@ -232,12 +259,18 @@ int main()
 	{
 		sf::Event event;
 		while (window.pollEvent(event)) {
+			
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
-				playinggame = true;
-				break;
+				sf::Vector2f mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+				sf::FloatRect bound = bbutton.getGlobalBounds();
+				if (bound.contains(mouseCoords)) {
+					playinggame = true;
+					break;
+				}
 			}
+			
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 			{
 				window.close();
@@ -247,9 +280,15 @@ int main()
 		window.clear();
 
 		//design main menu here
+
+		window.draw(map0);
+		window.draw(map1);
+		window.draw(map2);
+		window.draw(map3);
+
+		
 		window.draw(sbutton);
 		window.draw(playSandbox);
-		
 		window.draw(bbutton);
 		window.draw(playBattle);
 
@@ -260,7 +299,7 @@ int main()
 	}
 
 
-
+	sf::sleep(sf::milliseconds(250));
 
 
 
