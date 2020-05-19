@@ -116,6 +116,24 @@ void moveNode(Person& prim, Person& closest)
 			i++;
 		}
 	}
+	else
+	{
+		int i = 0;
+		while (i < 3) {
+			//if no one of different colors in nearby, go towards the center
+			float dx = 640 - prim.position.x;
+			float dy = 360 - prim.position.y;
+			if (dx > 0)
+				prim.moveRight();
+			if (dx < 0)
+				prim.moveLeft();
+			if (dy > 0)
+				prim.moveDown();
+			if (dy < 0)
+				prim.moveUp();
+			i++;
+		}
+	}
 }
 
 
@@ -173,7 +191,11 @@ void getUserInput(sf::RenderWindow& window, sf::Event& event)
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1280, 720), "My window");
+	sf::Texture t;
+	t.loadFromFile(theMap.to_string());
+	sf::Sprite s(t);
 
+	
 	sf::Clock r;
 	sf::Time elapsed_time;
 	
@@ -189,7 +211,8 @@ int main()
 		}
 		
 		window.clear();
-
+		
+		window.draw(s);
 		//update game 
 		if (!ar.empty()) {
 			for (auto& i : ar)
@@ -203,7 +226,6 @@ int main()
 				window.draw(i.shape);
 			}
 		}
-
 		window.display();
 
 		//after the display
