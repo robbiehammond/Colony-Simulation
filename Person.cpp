@@ -22,10 +22,6 @@ Person::Person(float startX, float startY, Colony _col, Map _curMap)
 	myCol = _col;
 }
 
-sf::FloatRect Person::getPosition()
-{
-	return shape.getGlobalBounds();
-}
 
 
 //checking the same bounds twice here, do it only once by using a variable
@@ -39,7 +35,7 @@ void Person::moveUp()
 		position.y -= speed;
 		shape.setPosition(position);
 	}
-	//if it's not, push them backwards
+	//if it's not, push them backwards and nudge them toward the center
 	if (!checkBounds(position.x, temp))
 	{
 		if (position.x < 640) {

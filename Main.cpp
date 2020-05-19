@@ -5,6 +5,7 @@
 #include "Colony.h"
 #include "Map.h"
 
+//TODO Make a game state/state machine file and turn this file into a "playing game" state. Make it so that this file supports all game modes. main method becomes "run". Make a state for the start menu, and whatever else I need
 using namespace std;
 
 //holds all active people

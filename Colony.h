@@ -9,4 +9,5 @@ class Colony
 public:
 	Colony(sf::Color _color);
 	sf::Color color;
+	bool powerUp;
 };

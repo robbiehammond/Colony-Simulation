@@ -20,6 +20,9 @@ void Map::setRestrictions()
 	//before switch, put bounds that are the same for every map (ie edge boundaries)
 	
 	switch (m) {
+	case Map0:
+		//no boundaries 
+		break;
 	case Map1:
 		//top left square
 		x_restriction = make_tuple(100, 200);
