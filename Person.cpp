@@ -42,8 +42,15 @@ void Person::moveUp()
 	//if it's not, push them backwards
 	if (!checkBounds(position.x, temp))
 	{
-		position.x += speed;
-		shape.setPosition(position);
+		if (position.x < 640) {
+			position.x += speed;
+			shape.setPosition(position);
+		}
+		else
+		{
+			position.x -= speed;
+			shape.setPosition(position);
+		}
 	}
 	//so they don't get stuck, move them in a perpendicular direction as well
 	while (!checkBounds(position.x, position.y)) {
@@ -63,8 +70,15 @@ void Person::moveDown()
 	}
 	if (!checkBounds(position.x, temp))
 	{
-		position.x -= speed;
-		shape.setPosition(position);
+		if (position.x < 640) {
+			position.x += speed;
+			shape.setPosition(position);
+		}
+		else
+		{
+			position.x -= speed;
+			shape.setPosition(position);
+		}
 	}
 	
 	while (!checkBounds(position.x, position.y)) {
@@ -84,8 +98,15 @@ void Person::moveLeft()
 	}
 	if (!checkBounds(temp, position.y))
 	{
-		position.y -= speed;
-		shape.setPosition(position);
+		if (position.y < 360) {
+			position.y += speed;
+			shape.setPosition(position);
+		}
+		else
+		{
+			position.y -= speed;
+			shape.setPosition(position);
+		}
 	}
 	
 	while (!checkBounds(position.x, position.y)) {
@@ -106,8 +127,15 @@ void Person::moveRight()
 	}
 	if (!checkBounds(temp,position.y))
 	{
-		position.y += speed;
-		shape.setPosition(position);
+		if (position.y < 360) {
+			position.y += speed;
+			shape.setPosition(position);
+		}
+		else
+		{
+			position.y -= speed;
+			shape.setPosition(position);
+		}
 	}
 		
 	while (!checkBounds(position.x, position.y)) {
