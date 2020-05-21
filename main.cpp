@@ -188,7 +188,7 @@ void getUserInput(sf::RenderWindow& window, sf::Event& event)
 	}
 }
 
-void TitleScreen(sf::RenderWindow& window, sf::Font font) {
+void LoadTitleScreen(sf::RenderWindow& window, sf::Font font) {
 	//main menu
 	sf::Text title("Colony Simulator", font);
 	title.setPosition(450, 25);
@@ -390,7 +390,7 @@ int main()
 	sf::Font font;
 	font.loadFromFile("arial.ttf"); //choose a more interesting font later
 
-	TitleScreen(window, font);
+	LoadTitleScreen(window, font);
 
 	
 	
@@ -399,7 +399,6 @@ int main()
 
 	
 	//playing the game on conflict mode 
-	//if (playinggame) {
 		sf::Texture maptext;
 		maptext.loadFromFile(theMap.to_string());
 		sf::Sprite map(maptext);
@@ -453,7 +452,6 @@ int main()
 			}
 			if (elapsed_time.asMilliseconds() % 400)
 				random_shuffle(ar.begin(), ar.end());
-		//}
 
 	}
 	//on close 

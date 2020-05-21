@@ -59,6 +59,5 @@ void Map::setRestrictions()
 
 string Map::to_string()
 {
-	cout << stringMapNames.at(m);
 	return stringMapNames.at(m);
 }
