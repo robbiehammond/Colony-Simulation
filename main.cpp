@@ -9,6 +9,7 @@ using namespace std;
 
 //holds all active people
 vector<Person> ar;
+
 //the selected map
 Map theMap(Map1);
 
@@ -57,7 +58,7 @@ void fillAr(int x, int y, Colony col)
 
 
 //Finds a close enemy
-//Probably can be implemented better
+//A more effienct search algorithm (such as BFS) certainly would've worked better here. But the only (simple) way to use BFS and keep fluid movement is to use an extremely large grid, which causes even greater performance issues. Since the point of this project was not to make my own chunking system, I decided to simply prioritize the fluidity of the movement and not use BFS
 Person findClose(Person& prim)
 {
 	//placeholder for when the closesst is itself
@@ -182,131 +183,223 @@ void getUserInput(sf::RenderWindow& window, sf::Event& event)
 	{
 		if (event.key.code == sf::Keyboard::A)
 		{
-			cout << ar.size();
+			cout << ar.size() << endl;
 		}
 	}
 }
 
-
-
-int main()
-{
-	sf::RenderWindow window(sf::VideoMode(1280, 720), "My window", sf::Style::Close);
-
-
-
-	
+void TitleScreen(sf::RenderWindow& window, sf::Font font) {
 	//main menu
+	sf::Text title("Colony Simulator", font);
+	title.setPosition(450, 25);
+	title.setCharacterSize(50);
+	title.setFillColor(sf::Color::Green);
+
+
 	//map selections - fill them in with images later
+	//map0
 	sf::RectangleShape map0(sf::Vector2f(100, 100));
 	map0.setPosition(400, 100);
 	map0.setOutlineColor(sf::Color::White);
 	map0.setOutlineThickness(2);
 	map0.setFillColor(sf::Color::Black);
-	
+	sf::Text map0Text(" Map 0", font);
+	map0Text.setPosition(400, 200);
 
+	//map1
 	sf::RectangleShape map1(sf::Vector2f(100, 100));
 	map1.setPosition(780, 100);
 	map1.setOutlineColor(sf::Color::White);
 	map1.setOutlineThickness(2);
 	map1.setFillColor(sf::Color::Black);
+	sf::Texture map1Tex;
+	map1Tex.loadFromFile("map1.png");
+	sf::Sprite map1sprite(map1Tex);
+	map1sprite.setPosition(780, 100);
+	map1sprite.setScale(.075, .12);
+	sf::Text map1Text(" Map 1", font);
+	map1Text.setPosition(780, 200);
 
+
+
+	//map2
 	sf::RectangleShape map2(sf::Vector2f(100, 100));
 	map2.setPosition(400, 300);
 	map2.setOutlineColor(sf::Color::White);
 	map2.setOutlineThickness(2);
 	map2.setFillColor(sf::Color::Black);
+	/*
+	once map2 gets made
+	sf::Texture map2Tex;
+	map2Tex.loadFromFile("map2.png");
+	sf::Sprite map2sprite(map2Tex);
+	map2sprite.setPosition(780, 100);
+	map2sprite.setScale(.075, .12);
+	*/
+	sf::Text map2Text(" Map 2", font);
+	map2Text.setPosition(400, 400);
 
+
+
+	//map3
 	sf::RectangleShape map3(sf::Vector2f(100, 100));
 	map3.setPosition(780, 300);
 	map3.setOutlineColor(sf::Color::White);
 	map3.setOutlineThickness(2);
 	map3.setFillColor(sf::Color::Black);
+	/*
+	once map3 gets made
+	sf::Texture map3Tex;
+	map3Tex.loadFromFile("map3.png");
+	sf::Sprite map3sprite(map3Tex);
+	map3sprite.setPosition(780, 100);
+	map3sprite.setScale(.075, .12);
+	*/
+	sf::Text map3Text(" Map 3", font);
+	map3Text.setPosition(780, 400);
 
-	
+
+
+
 	//sandbox mode button
 	sf::RectangleShape sbutton(sf::Vector2f(270, 50));
 	sbutton.setPosition(100, 500);
 	sbutton.setOutlineColor(sf::Color::Red);
 	sbutton.setOutlineThickness(2);
 	sbutton.setFillColor(sf::Color::Black);
+	sf::Text playSandbox("Play Sandbox Mode", font);
+	playSandbox.setPosition(sf::Vector2f(100, 500));
+	playSandbox.setFillColor(sf::Color::Red);
 
-	//battlemode button
+	//conflict mode button
 	sf::RectangleShape bbutton(sf::Vector2f(270, 50));
 	bbutton.setPosition(910, 500);
 	bbutton.setOutlineColor(sf::Color::Green);
 	bbutton.setOutlineThickness(2);
 	bbutton.setFillColor(sf::Color::Black);
-
-
-	
-	
-	sf::Font font;
-	font.loadFromFile("arial.ttf");
-
-	
-	sf::Text playSandbox("Play Sandbox Mode", font);
-	playSandbox.setPosition(sf::Vector2f(100, 500));
-	playSandbox.setFillColor(sf::Color::Red);
-
 	sf::Text playBattle(" Play Conflict Mode", font);
 	playBattle.setPosition(sf::Vector2f(910, 500));
 	playBattle.setFillColor(sf::Color::Green);
-	
-	
+
+	//info blurb
+	sf::Text projectDesc("A fun quarantine project by Robbie Hammond\n"
+		"https://github.com/robbiehammond/Simulation", font);
+	projectDesc.setCharacterSize(10);
+	projectDesc.setPosition(1060, 690);
+
+
 	bool playinggame = false;
 	while (window.isOpen() && !playinggame)
 	{
 		sf::Event event;
 		while (window.pollEvent(event)) {
-			
+
 
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
+				//check if play conflict mode was clicked
 				sf::Vector2f mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 				sf::FloatRect bound = bbutton.getGlobalBounds();
 				if (bound.contains(mouseCoords)) {
 					playinggame = true;
 					break;
 				}
+				//This should be done better 
+				//check if map1 was clicked 
+				bound = map0.getGlobalBounds();
+				if (bound.contains(mouseCoords)) {
+					map0.setOutlineColor(sf::Color::Blue);
+					map1.setOutlineColor(sf::Color::White);
+					map2.setOutlineColor(sf::Color::White);
+					map3.setOutlineColor(sf::Color::White);
+				}
+				//check if map1 was clicked 
+				bound = map1.getGlobalBounds();
+				if (bound.contains(mouseCoords)) {
+					map1.setOutlineColor(sf::Color::Blue);
+					map0.setOutlineColor(sf::Color::White);
+					map2.setOutlineColor(sf::Color::White);
+					map3.setOutlineColor(sf::Color::White);
+				}
+				//check if map2 was clicked 
+				bound = map2.getGlobalBounds();
+				if (bound.contains(mouseCoords)) {
+					map2.setOutlineColor(sf::Color::Blue);
+					map0.setOutlineColor(sf::Color::White);
+					map1.setOutlineColor(sf::Color::White);
+					map3.setOutlineColor(sf::Color::White);
+				}
+				//check if map3 was clicked 
+				bound = map3.getGlobalBounds();
+				if (bound.contains(mouseCoords)) {
+					map3.setOutlineColor(sf::Color::Blue);
+					map0.setOutlineColor(sf::Color::White);
+					map1.setOutlineColor(sf::Color::White);
+					map2.setOutlineColor(sf::Color::White);
+				}
+
 			}
-			
+
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
 			{
 				window.close();
 			}
 		}
-		
+
 		window.clear();
 
 		//design main menu here
+		window.draw(title);
 
 		window.draw(map0);
-		window.draw(map1);
-		window.draw(map2);
-		window.draw(map3);
+		window.draw(map0Text);
 
-		
+		window.draw(map1);
+		window.draw(map1sprite);
+		window.draw(map1Text);
+
+		window.draw(map2);
+		//draw sprite
+		window.draw(map2Text);
+
+
+		window.draw(map3);
+		//draw sprite
+		window.draw(map3Text);
+
+
 		window.draw(sbutton);
 		window.draw(playSandbox);
 		window.draw(bbutton);
 		window.draw(playBattle);
 
+		window.draw(projectDesc);
 
-		
 		window.display();
 
 	}
 
-
+	//avoid double clicking
 	sf::sleep(sf::milliseconds(250));
+}
 
+
+int main()
+{
+	sf::RenderWindow window(sf::VideoMode(1280, 720), "My window", sf::Style::Close);
+	sf::Font font;
+	font.loadFromFile("arial.ttf"); //choose a more interesting font later
+
+	TitleScreen(window, font);
+
+	
+	
 
 
 
 	
-	//playing the game
-	if (playinggame) {
+	//playing the game on conflict mode 
+	//if (playinggame) {
 		sf::Texture maptext;
 		maptext.loadFromFile(theMap.to_string());
 		sf::Sprite map(maptext);
@@ -358,9 +451,9 @@ int main()
 					size = ar.size();
 				}
 			}
-			if (elapsed_time.asMilliseconds() % 250)
+			if (elapsed_time.asMilliseconds() % 400)
 				random_shuffle(ar.begin(), ar.end());
-		}
+		//}
 
 	}
 	//on close 
