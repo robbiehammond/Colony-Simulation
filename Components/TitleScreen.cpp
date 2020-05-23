@@ -154,7 +154,7 @@ void TitleScreen::loadScreen()
 	while (window.isOpen() && !playingGame) {
 		sf::Event event;
 		while (window.pollEvent(event)) {
-			if (clickInRange(conflictBox))
+			if (clickInRange(sandboxBox))
 			{
 				playingGame = true;
 			}
