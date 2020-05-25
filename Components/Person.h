@@ -25,13 +25,14 @@ public:
 	int damage;
 	Map curMap;
 
-	sf::FloatRect getPosition();
 	float distance(Person& other);
 	void moveUp();
 	void moveDown();
 	void moveRight();
 	void moveLeft();
+
 	void updateRadius(float radius);
+	void updateHealth(float health);
 	bool checkBounds(float x, float y);
 	//make random animal spawns (just to get their positions different)
 

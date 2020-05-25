@@ -9,9 +9,9 @@ Person::Person(float startX, float startY, Colony _col, Map _curMap)
 	found = false;
 
 	//these are mutatable
-	radius = 10;
 	health = 10;
-	damage = 1;
+	radius = health;
+	damage = 1 + (rand() % 10);
 	
 	position.x = startX;
 	position.y = startY;
@@ -112,6 +112,7 @@ void Person::moveLeft()
 	}
 }
 
+
 void Person::moveRight()
 {
 	
@@ -147,9 +148,18 @@ float Person::distance(Person& other)
 	return sqrt(pow(other.position.x - this->position.x, 2) + pow(other.position.y - this->position.y, 2) * 1.0);
 }
 
+
 void Person::updateRadius(float _radius)
 {
 	radius = _radius;
+	shape.setRadius(radius);
+
+}
+
+void Person::updateHealth(float _health)
+{
+	health = _health;
+	updateRadius(health);
 }
 
 //returns if the bounds are valid 

@@ -5,6 +5,10 @@
 #include "Map.h"
 #include "TitleScreen.h"
 #include "SandboxMode.h"
+#include "ConflictMode.h"
+
+//the selected Game mode
+Mode selectedMode;
 
 //the selected map
 Map theMap(Map0);
@@ -16,8 +20,13 @@ int main()
 	font.loadFromFile("arial.ttf"); //choose a more interesting font later
 
 	TitleScreen title(window, font);
-	title.loadScreen();
+	selectedMode = title.getSelectedMode();
 	theMap = title.getChosenMap();
+
 	sf::sleep(sf::milliseconds(250));
-	SandboxMode sandbox(window, font, theMap);
+
+	if (selectedMode == Sandbox)
+		SandboxMode sandbox(window, font, theMap);
+	//if (selectedMode == Conflict)
+		//do shit later 
 }

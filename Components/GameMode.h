@@ -1,6 +1,11 @@
 #pragma once
 #include "Person.h"
 #include "Colony.h"
+
+enum Mode {
+	Sandbox,
+	Conflict
+};
 //abstract class that holds stuff that all game modes share goes here
 class GameMode {
 public:

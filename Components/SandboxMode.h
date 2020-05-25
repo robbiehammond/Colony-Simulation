@@ -5,6 +5,7 @@ public:
 	SandboxMode(sf::RenderWindow& _window, sf::Font& _font, Map _map);
 	void getUserInput(sf::RenderWindow& window, sf::Event& event);
 	void fillAr(int x, int y, Colony col);
+	void randomSpawn();
 	void playGame();
 private:
 	sf::RenderWindow& window;

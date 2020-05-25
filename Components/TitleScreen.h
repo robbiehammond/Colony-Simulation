@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include "Map.h"
+#include "GameMode.h"
 using namespace std;
 
 class TitleScreen {
@@ -17,9 +18,12 @@ public:
 	bool clickInRange(sf::RectangleShape& object);
 	void setColorOnClick(sf::RectangleShape& box0, sf::RectangleShape& box1, sf::RectangleShape& box2, sf::RectangleShape& box3);
 	Map getChosenMap();
+	Mode getSelectedMode();
 	void loadScreen();
 
+
 private:
+	Mode selectedMode;
 	sf::RenderWindow& window;
 	sf::Font& font;
 	sf::Text projectDesc;

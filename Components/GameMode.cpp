@@ -58,8 +58,11 @@ void GameMode::moveNode(Person& prim, Person& closest)
 			if (dy < 0)
 				prim.moveUp();
 			if (prim.shape.getGlobalBounds().intersects(closest.shape.getGlobalBounds()) && closest.shape.getPosition() != prim.shape.getPosition()) {
-				prim.health -= closest.damage;
-				closest.health -= 1;
+				prim.updateHealth(prim.health - closest.damage);
+				if (prim.damage > 1)
+					prim.damage -= 1;
+				closest.updateHealth(closest.health - 1);
+
 			}
 			i++;
 		}
@@ -86,12 +89,16 @@ void GameMode::moveNode(Person& prim, Person& closest)
 void GameMode::mutate(Person& person)
 {
 	int random = 1 + (rand() % 1000);
-	//mutation 1: get bigger
+	//mutation 1: get healthier
 	if (random == 500)
 	{
-		person.updateRadius(person.radius + 1);
-		person.shape.setRadius(person.radius);
+		person.updateHealth(person.radius + 1);
+	}
+	//mutation 2: get stronger
+	if (random == 501) {
+		person.damage += 1;
 	}
 }
+
 
 

@@ -14,6 +14,7 @@ TitleScreen::TitleScreen(sf::RenderWindow& _window, sf::Font& _font)
 	title.setPosition(450, 25);
 	title.setCharacterSize(50);
 	title.setFillColor(sf::Color::White);
+	loadScreen();
 }
 
 
@@ -117,7 +118,10 @@ Map TitleScreen::getChosenMap()
 	return mapChosen;
 }
 
-
+Mode TitleScreen::getSelectedMode()
+{
+	return selectedMode;
+}
 
 
 
@@ -157,6 +161,12 @@ void TitleScreen::loadScreen()
 			if (clickInRange(sandboxBox))
 			{
 				playingGame = true;
+				selectedMode = Sandbox;
+			}
+			if (clickInRange(conflictBox))
+			{
+				playingGame = true;
+				selectedMode = Conflict;
 			}
 
 		setColorOnClick(map0box, map1box, map2box, map3box);
