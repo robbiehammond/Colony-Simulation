@@ -18,7 +18,9 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(1280, 720), "My window", sf::Style::Close);
 	sf::Font font;
 	font.loadFromFile("arial.ttf"); //choose a more interesting font later
+	
 
+	//maybe do a while (selectedMode != exit) type thing here
 	TitleScreen title(window, font);
 	selectedMode = title.getSelectedMode();
 	theMap = title.getChosenMap();
@@ -27,6 +29,6 @@ int main()
 
 	if (selectedMode == Sandbox)
 		SandboxMode sandbox(window, font, theMap);
-	//if (selectedMode == Conflict)
-		//do shit later 
+	if (selectedMode == Conflict)
+		ConflictMode conflict(window, font, theMap);
 }
