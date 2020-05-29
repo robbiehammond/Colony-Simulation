@@ -8,6 +8,7 @@ public:
 	void getUserInput(sf::RenderWindow& window, sf::Event& event);
 	void fillAr(int x, int y, Colony col);
 	void spawn();
+	void findSpawner(Person& prim);
 	void playGame();
 private:
 	sf::RenderWindow& window;

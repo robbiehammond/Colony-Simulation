@@ -10,6 +10,8 @@ Colony _blueCol(sf::Color::Blue);
 Colony _yellowColony(sf::Color::Yellow);
 Colony _otherCol(sf::Color::White);
 
+bool allPlaced = false;
+
 
 
 
@@ -107,7 +109,7 @@ void ConflictMode::fillAr(int x, int y, Colony col)
 
 void ConflictMode::spawn()
 {
-	if (spawners.size() == 4 && ar.size() <= 100) {
+	if (allPlaced && ar.size() <= 100) {
 		for (int i = 0; i < spawners.size(); i++) {
 			Colony curCol(spawners[i].getFillColor());
 			int random = 1 + (rand() % 100);
@@ -117,6 +119,42 @@ void ConflictMode::spawn()
 			}
 		}
 	}
+}
+
+void ConflictMode::findSpawner(Person& prim)
+{
+	int closest = 5;
+	float dist = 10000;
+	for (int i = 0; i < spawners.size(); i++) {
+		//update, find the shape with the closest distance 
+		float dx = spawners[i].getPosition().x - prim.position.x;
+		float dy = spawners[i].getPosition().y - prim.position.y;
+		int curDist = sqrt(dx * dx + dy * dy);
+		if (curDist < dist) {
+			dist = curDist;
+			closest = i;
+		}
+	}
+	if (closest != 5) {
+		sf::Vector2f curScale = spawners[closest].getSize();
+		float dx = spawners[closest].getPosition().x - prim.position.x;
+		float dy = spawners[closest].getPosition().y - prim.position.y;
+		if (dx > 0)
+			prim.moveRight();
+		if (dx < 0)
+			prim.moveLeft();
+		if (dy > 0)
+			prim.moveDown();
+		if (dy < 0)
+			prim.moveUp();
+		if (prim.shape.getGlobalBounds().intersects(spawners[closest].getGlobalBounds()) && spawners[closest].getFillColor() != prim.myCol.color) {
+			curScale.x = curScale.x - 5;
+			curScale.y = curScale.y - 5;
+			spawners[closest].setSize(curScale);
+			cout << spawners[closest].getSize().x << " " << spawners[closest].getSize().y << endl;
+		}
+	}
+
 }
 
 void ConflictMode::playGame()
@@ -139,17 +177,27 @@ void ConflictMode::playGame()
 			getUserInput(window, event);
 		}
 
-		if (event.type == event.MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
-			setSpawnPoints();
-		}
 
 		window.clear();
 
+
 		window.draw(map);
 
-		for (sf::RectangleShape i : spawners) {
+		if (event.type == event.MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left && !allPlaced) {
+			setSpawnPoints();
+		}
+		if (spawners.size() == 4)
+			allPlaced = true;
+
+		int spawnerSize = spawners.size();
+		for (int i = 0; i < spawnerSize; i++) {
 			spawn();
-			window.draw(i);
+			if (spawners[i].getSize().x <= 0 && spawners[i].getSize().y <= 0) {
+				spawners.erase(spawners.begin() + i);
+				spawnerSize = spawners.size();
+			}
+			else
+				window.draw(spawners[i]);
 		}
 
 		if (!ar.empty()) {
@@ -160,6 +208,7 @@ void ConflictMode::playGame()
 					Person p = findClose(i);
 					mutate(i);
 					moveNode(i, p);
+					findSpawner(i);
 				}
 				move(i);
 				window.draw(i.shape);

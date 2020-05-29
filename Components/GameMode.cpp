@@ -63,7 +63,6 @@ void GameMode::moveNode(Person& prim, Person& closest)
 				if (prim.damage > 1)
 					prim.damage -= 1;
 				closest.updateHealth(closest.health - 1);
-
 			}
 			i++;
 		}
