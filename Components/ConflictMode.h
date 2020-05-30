@@ -6,6 +6,7 @@ public:
 	void setSpawnPoints();
 	bool clickInRange(sf::RectangleShape& object);
 	void getUserInput(sf::RenderWindow& window, sf::Event& event);
+	void moveNode(Person& prim, Person& closest);
 	void fillAr(int x, int y, Colony col);
 	void spawn();
 	void findSpawner(Person& prim);

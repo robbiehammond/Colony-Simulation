@@ -148,15 +148,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Colony.cpp" />
+    <ClCompile Include="ConflictMode.cpp" />
+    <ClCompile Include="GameMode.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Person.cpp" />
+    <ClCompile Include="SandboxMode.cpp" />
     <ClCompile Include="TitleScreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Colony.h" />
+    <ClInclude Include="ConflictMode.h" />
+    <ClInclude Include="GameMode.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Person.h" />
+    <ClInclude Include="SandboxMode.h" />
     <ClInclude Include="TitleScreen.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

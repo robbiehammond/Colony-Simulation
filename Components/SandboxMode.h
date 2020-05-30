@@ -6,6 +6,7 @@ public:
 	void getUserInput(sf::RenderWindow& window, sf::Event& event);
 	void fillAr(int x, int y, Colony col);
 	void randomSpawn();
+	void moveNode(Person& prim, Person& closest);
 	void playGame();
 private:
 	sf::RenderWindow& window;

@@ -30,7 +30,7 @@ Person GameMode::findClose(Person& prim)
 
 	for (auto i = 0; i < ar.size(); i++) {
 		const float curNodeDist = prim.distance(ar[i]);
-		if (curNodeDist < curMinDist && curNodeDist != 0) {
+		if (curNodeDist < curMinDist && curNodeDist != 0 && ar[i].myCol.color != prim.myCol.color) {
 			saveNode = &ar[i];
 			break;
 		}
@@ -42,49 +42,52 @@ Person GameMode::findClose(Person& prim)
 		return *saveNode;
 }
 
-void GameMode::moveNode(Person& prim, Person& closest)
+void GameMode::findHardClose(Person& prim)
 {
-	float dist = prim.distance(closest);
-	if (dist != 0 && dist < 1000 && prim.myCol.color != closest.myCol.color) {
-		int i = 0; 
-		while (i < 3) {
-			float dx = closest.position.x - prim.position.x;
-			float dy = closest.position.y - prim.position.y;
-			if (dx > 0)
-				prim.moveRight();
-			if (dx < 0)
-				prim.moveLeft();
-			if (dy > 0)
-				prim.moveDown();
-			if (dy < 0)
-				prim.moveUp();
-			if (prim.shape.getGlobalBounds().intersects(closest.shape.getGlobalBounds()) && closest.shape.getPosition() != prim.shape.getPosition()) {
-				prim.updateHealth(prim.health - closest.damage);
-				if (prim.damage > 1)
-					prim.damage -= 1;
-				closest.updateHealth(closest.health - 1);
-			}
-			i++;
+	Person placeholder(-10000, -100000, prim.myCol, prim.curMap);
+
+	float curMinDist = 400;
+
+	Person* saveNode = &prim;
+
+	for (auto i = 0; i < ar.size(); i++) {
+		const float curNodeDist = prim.distance(ar[i]);
+		if (curNodeDist < curMinDist && curNodeDist != 0 && ar[i].myCol.color != prim.myCol.color) {
+			saveNode = &ar[i];
+			break;
 		}
 	}
-	else
-	{
-		int i = 0;
-		while (i < 3) {
-			float dx = 640 - prim.position.x;
-			float dy = 360 - prim.position.y;
-			if (dx > 0)
-				prim.moveRight();
-			if (dx < 0)
-				prim.moveLeft();
-			if (dy > 0)
-				prim.moveDown();
-			if (dy < 0)
-				prim.moveUp();
-			i++;
+	if (saveNode->shape.getPosition() == prim.shape.getPosition()) {
+		return;
+	}
+	else {
+		Person closest = *saveNode;
+		int dist = prim.distance(closest);
+		if (dist != 0 && dist < 1000 && prim.myCol.color != closest.myCol.color) {
+			int i = 0;
+			while (i < 3) {
+				float dx = closest.position.x - prim.position.x;
+				float dy = closest.position.y - prim.position.y;
+				if (dx > 0)
+					prim.moveRight();
+				if (dx < 0)
+					prim.moveLeft();
+				if (dy > 0)
+					prim.moveDown();
+				if (dy < 0)
+					prim.moveUp();
+				if (prim.shape.getGlobalBounds().intersects(closest.shape.getGlobalBounds()) && closest.shape.getPosition() != prim.shape.getPosition()) {
+					prim.updateHealth(prim.health - closest.damage);
+					if (prim.damage > 1)
+						prim.damage -= 1;
+					closest.updateHealth(closest.health - 1);
+				}
+				i++;
+			}
 		}
 	}
 }
+
 
 void GameMode::mutate(Person& person)
 {

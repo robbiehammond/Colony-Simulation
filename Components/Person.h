@@ -31,6 +31,7 @@ public:
 	void moveRight();
 	void moveLeft();
 
+	void moveToCenter();
 	void updateRadius(float radius);
 	void updateHealth(float health);
 	bool checkBounds(float x, float y);

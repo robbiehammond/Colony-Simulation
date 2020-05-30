@@ -149,6 +149,25 @@ float Person::distance(Person& other)
 }
 
 
+void Person::moveToCenter()
+{
+	int i = 0;
+	while (i < 3) {
+		float dx = 640 - position.x;
+		float dy = 360 - position.y;
+		if (dx > 0)
+			moveRight();
+		if (dx < 0)
+			moveLeft();
+		if (dy > 0)
+			moveDown();
+		if (dy < 0)
+			moveUp();
+		i++;
+	}
+
+}
+
 void Person::updateRadius(float _radius)
 {
 	radius = _radius;
