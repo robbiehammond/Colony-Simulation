@@ -70,6 +70,20 @@ bool ConflictMode::clickInRange(sf::RectangleShape& object)
 		return false;
 }
 
+//if a spawner is close (maybe within 50?), ignore all other nodes and go to spawner 
+bool ConflictMode::spawnerClose(Person& prim)
+{
+	int x = prim.shape.getPosition().x;
+	int y = prim.shape.getPosition().y;
+	for (int i = 0; i < spawners.size(); i++) {
+		if (abs(spawners[i].getPosition().x - x) < 100 && abs(spawners[i].getPosition().y - y) < 100 && spawners[i].getFillColor() != prim.myCol.color) {
+			//cout << "true was found";
+			return true;
+		}
+	}
+	return false;
+}
+
 void ConflictMode::getUserInput(sf::RenderWindow& window, sf::Event& event)
 {
 	if (event.type == sf::Event::Closed)
@@ -94,8 +108,10 @@ void ConflictMode::getUserInput(sf::RenderWindow& window, sf::Event& event)
 
 void ConflictMode::moveNode(Person& prim, Person& closest)
 {
+	bool found = false;
 	float dist = prim.distance(closest);
 	if (dist != 0 && dist < 1000 && prim.myCol.color != closest.myCol.color) {
+		found = true;
 		int i = 0;
 		while (i < 3) {
 			float dx = closest.position.x - prim.position.x;
@@ -120,13 +136,17 @@ void ConflictMode::moveNode(Person& prim, Person& closest)
 	else if (spawners.size() == 1 && spawners[0].getFillColor() != prim.myCol.color) { //only spawner on board matches doesn't this person's color 
 		findSpawner(prim); //find and go to close spawner
 	}
-	else if (spawners.size() == 1 && spawners[0].getFillColor() == prim.myCol.color) {
-		findHardClose(prim);
+	else if (spawners.size() == 1 && spawners[0].getFillColor() == prim.myCol.color) { //and there are still other people around
+		found = findHardClose(prim);
 	}
-	else {
+	//if none of the above happened, then found needs to be set to false to do below 
+	else if (spawners.size() == 0) {
+		found = false;
+	}
+	if (!found) { //only happens when there is no one else to kill
 		prim.moveToCenter();
-	}
-
+		}
+	//make finding spawners "harder"
 }
 
 void ConflictMode::fillAr(int x, int y, Colony col)
@@ -149,9 +169,15 @@ void ConflictMode::spawn()
 	if (allPlaced && ar.size() <= 100) {
 		for (int i = 0; i < spawners.size(); i++) {
 			Colony curCol(spawners[i].getFillColor());
-			int random = 1 + (rand() % 100);
-			int random2 = 1 + (rand() % 100);
-			if (random == 50 && random2 == 14) {
+
+			//TODO Function based on spawners[i].size()
+			//smaller number = higher chance, so we want something that's 1/(size) * 100 so that it's an int, make const too
+			//spawners are by defualt size 50
+
+			const int num = (1.0 / (2 * spawners[i].getSize().x)) * 10000; //100 at normal size, right now it's like permanently 100
+			int random = 1 + (rand() % num); //this should be the rate at full size, we're currently dividing by 0, so fix this problem eventually
+			int random2 = 1 + (rand() % num);
+			if (random == 5 && random2 == 5) {
 				fillAr(spawners[i].getPosition().x, spawners[i].getPosition().y, curCol);
 			}
 		}
@@ -245,11 +271,16 @@ void ConflictMode::playGame()
 			for (auto& i : ar)
 			{
 				if (elapsed_time.asMilliseconds() % 100 == 0) {
-
-					Person p = findClose(i);
-					mutate(i);
-					moveNode(i, p);
-					findSpawner(i);
+					//if there's a spawner close, go to spawner 
+					if (spawnerClose(i)) {
+						findSpawner(i);
+					}
+					else {
+						Person p = findClose(i);
+						mutate(i);
+						moveNode(i, p);
+						findSpawner(i); //comment out later
+					}
 				}
 				move(i);
 				window.draw(i.shape);

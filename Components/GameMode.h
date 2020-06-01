@@ -12,7 +12,7 @@ class GameMode {
 public:
 	void move(Person& p);
 	Person findClose(Person& prim);
-	void findHardClose(Person& prim);
+	bool findHardClose(Person& prim);
 	void mutate(Person& person);
 	virtual void getUserInput(sf::RenderWindow& window, sf::Event& event) = 0; //controls are slightly different for each mode
 	virtual void playGame() = 0;

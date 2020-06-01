@@ -5,6 +5,7 @@ public:
 	ConflictMode(sf::RenderWindow& _window, sf::Font& _font, Map _map);
 	void setSpawnPoints();
 	bool clickInRange(sf::RectangleShape& object);
+	bool spawnerClose(Person& prim);
 	void getUserInput(sf::RenderWindow& window, sf::Event& event);
 	void moveNode(Person& prim, Person& closest);
 	void fillAr(int x, int y, Colony col);

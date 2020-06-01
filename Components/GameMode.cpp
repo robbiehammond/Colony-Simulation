@@ -42,8 +42,9 @@ Person GameMode::findClose(Person& prim)
 		return *saveNode;
 }
 
-void GameMode::findHardClose(Person& prim)
+bool GameMode::findHardClose(Person& prim)
 {
+
 	Person placeholder(-10000, -100000, prim.myCol, prim.curMap);
 
 	float curMinDist = 400;
@@ -58,7 +59,7 @@ void GameMode::findHardClose(Person& prim)
 		}
 	}
 	if (saveNode->shape.getPosition() == prim.shape.getPosition()) {
-		return;
+		return false;
 	}
 	else {
 		Person closest = *saveNode;
@@ -86,6 +87,7 @@ void GameMode::findHardClose(Person& prim)
 			}
 		}
 	}
+	return true;
 }
 
 
