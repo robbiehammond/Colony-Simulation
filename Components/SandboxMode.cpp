@@ -68,6 +68,39 @@ void SandboxMode::moveNode(Person& prim, Person& closest)
 	}
 }
 
+void SandboxMode::removeAndShuffle(sf::Time& elapsed_time)
+{
+	int size = ar.size();
+	for (int i = 0; i < size; i++)
+	{
+		if (ar[i].health <= 0)
+		{
+			ar.erase(ar.begin() + i);
+			size = ar.size();
+		}
+	}
+	if (elapsed_time.asMilliseconds() % 400) {
+		random_shuffle(ar.begin(), ar.end());
+		randomSpawn();
+	}
+}
+
+void SandboxMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
+{
+	if (!ar.empty()) {
+		for (auto& i : ar)
+		{
+			if (elapsed_time.asMilliseconds() % 100 == 0) {
+				Person p = findClose(i);
+				mutate(i);
+				moveNode(i, p);
+			}
+			move(i);
+			window.draw(i.shape);
+		}
+	}
+}
+
 void SandboxMode::getUserInput(sf::RenderWindow& window, sf::Event& event)
 {
 	if (event.type == sf::Event::Closed)
@@ -125,39 +158,16 @@ void SandboxMode::playGame()
 
 		window.clear();
 
+
 		window.draw(map);
 
 
 		//update game 
-		if (!ar.empty()) {
-			for (auto& i : ar)
-			{
-				if (elapsed_time.asMilliseconds() % 100 == 0) {
-					Person p = findClose(i);
-					mutate(i);
-					moveNode(i, p);
-				}
-				move(i);
-				window.draw(i.shape);
-			}
-		}
+		updateNodes(window, elapsed_time);
 		window.display();
 
 		//after the display
-		int size = ar.size();
-		for (int i = 0; i < size; i++)
-		{
-			if (ar[i].health <= 0)
-			{
-				ar.erase(ar.begin() + i);
-				size = ar.size();
-			}
-		}
-		if (elapsed_time.asMilliseconds() % 400) {
-			random_shuffle(ar.begin(), ar.end());
-			randomSpawn();
-		}
-
+		removeAndShuffle(elapsed_time);
 	}
 	//on close 
 	cout << "Amount of people left: " << ar.size();

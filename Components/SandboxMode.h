@@ -7,6 +7,8 @@ public:
 	void fillAr(int x, int y, Colony col);
 	void randomSpawn();
 	void moveNode(Person& prim, Person& closest);
+	void removeAndShuffle(sf::Time& elapsed_time);
+	void updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time);
 	void playGame();
 private:
 	sf::RenderWindow& window;

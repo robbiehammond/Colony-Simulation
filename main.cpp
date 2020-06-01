@@ -26,9 +26,9 @@ int main()
 	theMap = title.getChosenMap();
 
 	sf::sleep(sf::milliseconds(250));
-
 	if (selectedMode == Sandbox)
 		SandboxMode sandbox(window, font, theMap);
 	if (selectedMode == Conflict)
 		ConflictMode conflict(window, font, theMap);
+
 }

@@ -15,9 +15,9 @@ public:
 	bool findHardClose(Person& prim);
 	void mutate(Person& person);
 	virtual void getUserInput(sf::RenderWindow& window, sf::Event& event) = 0; //controls are slightly different for each mode
+	virtual void updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time) = 0;
+	virtual void removeAndShuffle(sf::Time& elapsed_time) = 0;
 	virtual void playGame() = 0;
 	virtual void moveNode(Person& prim, Person& closest) = 0;
-	vector<Person> ar;
-private:
-
+	vector<Person> ar; 
 };

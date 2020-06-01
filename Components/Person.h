@@ -14,11 +14,8 @@ public:
 	sf::CircleShape shape;
 	
 	Colony myCol;
-	//do something with this
-	bool found;
-	//eventually add?
-	//bool targetFound;
-	//add a "can move" variable based on the map - maybe just a list of valid coordinates
+
+	bool isDiseased;
 	float radius;
 	int health;
 	float speed = 0.2f;
@@ -35,6 +32,8 @@ public:
 	void updateRadius(float radius);
 	void updateHealth(float health);
 	bool checkBounds(float x, float y);
+	void generateDisease();
+	void spreadDisease();
 	//make random animal spawns (just to get their positions different)
 
 private:

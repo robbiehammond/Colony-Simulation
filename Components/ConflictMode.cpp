@@ -106,6 +106,9 @@ void ConflictMode::getUserInput(sf::RenderWindow& window, sf::Event& event)
 
 }
 
+
+
+
 void ConflictMode::moveNode(Person& prim, Person& closest)
 {
 	bool found = false;
@@ -224,18 +227,55 @@ void ConflictMode::findSpawner(Person& prim)
 
 }
 
+void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
+{
+	if (!ar.empty()) {
+		for (auto& i : ar)
+		{
+			if (elapsed_time.asMilliseconds() % 100 == 0) {
+				if (spawnerClose(i)) {
+					findSpawner(i);
+				}
+				else {
+					Person p = findClose(i);
+					mutate(i);
+					moveNode(i, p);
+					findSpawner(i);
+				}
+			}
+			move(i);
+			window.draw(i.shape);
+		}
+	}
+}
+
+void ConflictMode::removeAndShuffle(sf::Time& elapsed_time)
+{
+	int size = ar.size();
+	for (int i = 0; i < size; i++)
+	{
+		if (ar[i].health <= 0)
+		{
+			ar.erase(ar.begin() + i);
+			size = ar.size();
+		}
+	}
+	if (elapsed_time.asMilliseconds() % 100) {
+		random_shuffle(ar.begin(), ar.end());
+	}
+}
+
 void ConflictMode::playGame()
 {
-
 	sf::Clock r;
 	sf::Time elapsed_time;
-
 
 	sf::Texture maptext;
 	maptext.loadFromFile(map.to_string());
 	sf::Sprite map(maptext);
 
 	while (window.isOpen()) {
+
 		elapsed_time += r.restart();
 		sf::Event event;
 
@@ -243,11 +283,9 @@ void ConflictMode::playGame()
 		while (window.pollEvent(event)) {
 			getUserInput(window, event);
 		}
-
-
 		window.clear();
 
-
+		//udpating happens
 		window.draw(map);
 
 		if (event.type == event.MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left && !allPlaced) {
@@ -267,38 +305,11 @@ void ConflictMode::playGame()
 				window.draw(spawners[i]);
 		}
 
-		if (!ar.empty()) {
-			for (auto& i : ar)
-			{
-				if (elapsed_time.asMilliseconds() % 100 == 0) {
-					//if there's a spawner close, go to spawner 
-					if (spawnerClose(i)) {
-						findSpawner(i);
-					}
-					else {
-						Person p = findClose(i);
-						mutate(i);
-						moveNode(i, p);
-						findSpawner(i); //comment out later
-					}
-				}
-				move(i);
-				window.draw(i.shape);
-			}
-		}
+		updateNodes(window, elapsed_time);
 
 		window.display();
-		int size = ar.size();
-		for (int i = 0; i < size; i++)
-		{
-			if (ar[i].health <= 0)
-			{
-				ar.erase(ar.begin() + i);
-				size = ar.size();
-			}
-		}
-		if (elapsed_time.asMilliseconds() % 100) {
-			random_shuffle(ar.begin(), ar.end());
-		}
+
+		//remove and shuffle
+		removeAndShuffle(elapsed_time);
 	}
 }

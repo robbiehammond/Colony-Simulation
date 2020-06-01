@@ -6,7 +6,7 @@ using namespace std;
 Person::Person(float startX, float startY, Colony _col, Map _curMap)
 	: myCol(_col), curMap(_curMap.m)
 {
-	found = false;
+	isDiseased = false;
 
 	//these are mutatable
 	health = 10;
@@ -142,13 +142,6 @@ void Person::moveRight()
 	}
 }
 
-
-float Person::distance(Person& other)
-{
-	return sqrt(pow(other.position.x - this->position.x, 2) + pow(other.position.y - this->position.y, 2) * 1.0);
-}
-
-
 void Person::moveToCenter()
 {
 	int i = 0;
@@ -167,6 +160,12 @@ void Person::moveToCenter()
 	}
 
 }
+
+float Person::distance(Person& other)
+{
+	return sqrt(pow(other.position.x - this->position.x, 2) + pow(other.position.y - this->position.y, 2) * 1.0);
+}
+
 
 void Person::updateRadius(float _radius)
 {
@@ -210,4 +209,17 @@ bool Person::checkBounds(float x, float y)
 	}
 	//if that for loop is skipped altogether, that means there are no restrictions, so return true bc all coordinates are valid
 	return true;
+}
+
+//TODO: Make disease logic 
+void Person::generateDisease()
+{
+	int random = 1 + (rand() % 1000);
+	if (random == 2) {
+		isDiseased = true;
+	}
+}
+
+void Person::spreadDisease()
+{
 }
