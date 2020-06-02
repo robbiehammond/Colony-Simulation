@@ -13,7 +13,6 @@ Colony _otherCol(sf::Color::White);
 bool allPlaced = false;
 
 
-//make it so they only go to the center if there are no spawners on the board AND there are no people in range 
 
 //keep all the spawners here - 
 vector<sf::RectangleShape> spawners;
@@ -75,7 +74,7 @@ bool ConflictMode::spawnerClose(Person& prim)
 {
 	int x = prim.shape.getPosition().x;
 	int y = prim.shape.getPosition().y;
-	for (int i = 0; i < spawners.size(); i++) {
+	for (unsigned i = 0; i < spawners.size(); i++) {
 		if (abs(spawners[i].getPosition().x - x) < 100 && abs(spawners[i].getPosition().y - y) < 100 && spawners[i].getFillColor() != prim.myCol.color) {
 			//cout << "true was found";
 			return true;
@@ -108,7 +107,8 @@ void ConflictMode::getUserInput(sf::RenderWindow& window, sf::Event& event)
 
 
 
-
+//this function needs to be made into something non-spaghetti
+//we're double passing addresses!
 void ConflictMode::moveNode(Person& prim, Person& closest)
 {
 	bool found = false;
@@ -149,7 +149,6 @@ void ConflictMode::moveNode(Person& prim, Person& closest)
 	if (!found) { //only happens when there is no one else to kill
 		prim.moveToCenter();
 		}
-	//make finding spawners "harder"
 }
 
 void ConflictMode::fillAr(int x, int y, Colony col)
@@ -170,15 +169,12 @@ void ConflictMode::fillAr(int x, int y, Colony col)
 void ConflictMode::spawn()
 {
 	if (allPlaced && ar.size() <= 100) {
-		for (int i = 0; i < spawners.size(); i++) {
+		for (unsigned i = 0; i < spawners.size(); i++) {
 			Colony curCol(spawners[i].getFillColor());
 
-			//TODO Function based on spawners[i].size()
-			//smaller number = higher chance, so we want something that's 1/(size) * 100 so that it's an int, make const too
-			//spawners are by defualt size 50
 
-			const int num = (1.0 / (2 * spawners[i].getSize().x)) * 10000; //100 at normal size, right now it's like permanently 100
-			int random = 1 + (rand() % num); //this should be the rate at full size, we're currently dividing by 0, so fix this problem eventually
+			const int num = (1.0 / (2.0 * spawners[i].getSize().x)) * 10000; //100 at normal size
+			int random = 1 + (rand() % num); 
 			int random2 = 1 + (rand() % num);
 			if (random == 5 && random2 == 5) {
 				fillAr(spawners[i].getPosition().x, spawners[i].getPosition().y, curCol);
@@ -191,11 +187,11 @@ void ConflictMode::findSpawner(Person& prim)
 {
 	int closest = 5;
 	float dist = 10000;
-	for (int i = 0; i < spawners.size(); i++) {
+	for (unsigned i = 0; i < spawners.size(); i++) {
 		//update, find the shape with the closest distance 
 		float dx = spawners[i].getPosition().x - prim.position.x;
 		float dy = spawners[i].getPosition().y - prim.position.y;
-		int curDist = sqrt(dx * dx + dy * dy);
+		float curDist = sqrt(dx * dx + dy * dy);
 		if (curDist < dist && spawners[i].getFillColor() != prim.myCol.color) {
 			dist = curDist;
 			closest = i;
@@ -237,9 +233,10 @@ void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 					findSpawner(i);
 				}
 				else {
-					Person p = findClose(i);
-					mutate(i);
-					moveNode(i, p);
+					Person p = findClose(i); //we're making a copy
+					//i.generateDisease();
+					mutate(i);	
+					moveNode(i, p); //nullptr
 					findSpawner(i);
 				}
 			}
@@ -262,6 +259,13 @@ void ConflictMode::removeAndShuffle(sf::Time& elapsed_time)
 	}
 	if (elapsed_time.asMilliseconds() % 100) {
 		random_shuffle(ar.begin(), ar.end());
+	}
+}
+
+void ConflictMode::checkForDisease(Person& prim)
+{
+	if (prim.isDiseased) {
+
 	}
 }
 

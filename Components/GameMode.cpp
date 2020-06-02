@@ -1,6 +1,9 @@
 #include "GameMode.h"
 #include <iostream>
 
+
+
+
 void GameMode::move(Person& p)
 {
 	int random = 1 + (rand() % 4);
@@ -24,13 +27,13 @@ Person GameMode::findClose(Person& prim)
 {
 	Person placeholder(-10000, -100000, prim.myCol, prim.curMap);
 	
-	float curMinDist = 400;
+	float curMinDist = 400; //settable min detection distance
 
 	Person* saveNode = &prim;
 
 	for (auto i = 0; i < ar.size(); i++) {
 		const float curNodeDist = prim.distance(ar[i]);
-		if (curNodeDist < curMinDist && curNodeDist != 0 && ar[i].myCol.color != prim.myCol.color) {
+		if (curNodeDist < curMinDist && curNodeDist != 0) {
 			saveNode = &ar[i];
 			break;
 		}
@@ -103,4 +106,10 @@ void GameMode::mutate(Person& person)
 	if (random == 501) {
 		person.damage += 1;
 	}
+	//make logic to possibly remove the disease through mutation
+}
+
+StatusBar::StatusBar(int x, int y)
+{
+
 }

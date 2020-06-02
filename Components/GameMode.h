@@ -7,6 +7,11 @@ enum Mode {
 	Conflict
 };
 
+struct StatusBar {
+public:
+	StatusBar(int x, int y);
+};
+
 //abstract class that holds stuff that all game modes share goes here
 class GameMode {
 public:

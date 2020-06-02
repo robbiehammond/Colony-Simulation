@@ -33,7 +33,8 @@ public:
 	void updateHealth(float health);
 	bool checkBounds(float x, float y);
 	void generateDisease();
-	void spreadDisease();
+	void setDiseaseEffects();
+	void spreadDisease(Person& other);
 	//make random animal spawns (just to get their positions different)
 
 private:

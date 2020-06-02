@@ -211,15 +211,37 @@ bool Person::checkBounds(float x, float y)
 	return true;
 }
 
-//TODO: Make disease logic 
 void Person::generateDisease()
 {
-	int random = 1 + (rand() % 1000);
-	if (random == 2) {
-		isDiseased = true;
+	//only generate disease if they're not already diseased 
+	if (!isDiseased) {
+		int random = 1 + (rand() % 1000);
+		if (random == 2) {
+			isDiseased = true;
+			setDiseaseEffects();
+			cout << "Disease was gained" << endl;
+		}
 	}
 }
 
-void Person::spreadDisease()
+void Person::setDiseaseEffects()
+{ 
+		shape.setOutlineColor(sf::Color::White);
+		cout << this << endl;
+		shape.setOutlineThickness(2);//maybe make larger 
+
+}
+
+//who we spread disease to is found through ConflictMode file
+void Person::spreadDisease(Person& other)
 {
+	if (isDiseased && !other.isDiseased) {
+		int random = 1 + (rand() % 100); //maybe change this number later 
+		if (random == 5) {
+			other.isDiseased = true;
+			other.setDiseaseEffects();
+			cout << "disease was spread" << endl;
+			//doesn't work yet, not sure why
+		}
+	}
 }

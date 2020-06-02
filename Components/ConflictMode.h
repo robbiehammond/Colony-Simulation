@@ -13,6 +13,7 @@ public:
 	void spawn();
 	void findSpawner(Person& prim);
 	void removeAndShuffle(sf::Time& elapsed_time);
+	void checkForDisease(Person& prim);
 	void playGame();
 private:
 	sf::RenderWindow& window;
