@@ -239,17 +239,20 @@ void Person::setDiseaseEffects()
 }
 
 //who we spread disease to is found through ConflictMode file
-//TODO - Make generating and spreading rates to be a little slower 
 //Also, maybe not make this void, and whenever disease is spread, put on the status bar "(this node) just spread disease to (this other node)"
-void Person::spreadDisease(Person& other)
+//returns if the disease was successfully spread
+bool Person::spreadDisease(Person& other)
 {
 	if (isDiseased && !other.isDiseased) {
-		int random = 1 + (rand() % 1); //maybe change this number later 
-		if (random == 1) {
-			other.isDiseased = true;
-			other.setDiseaseEffects();
-			cout << "disease was spread" << endl;
-			//doesn't work yet, not sure why
-		}
+		other.isDiseased = true;
+		other.setDiseaseEffects();
+		cout << "disease was spread" << endl;//doesn't work yet, not sure why
+		return true;
 	}
+	return false;
+}
+
+void Person::assignName(string assignedName)
+{
+	name = assignedName;
 }

@@ -36,8 +36,8 @@ public:
 	bool checkBounds(float x, float y);
 	bool generateDisease(); //bool to return if the person actually got the disease or not 
 	void setDiseaseEffects();
-	void spreadDisease(Person& other);
-	//make random animal spawns (just to get their positions different)
+	bool spreadDisease(Person& other);
+	void assignName(string assignedName);
 
 private:
 	//TODO - make a list of names that ISN'T recreated each and every time a new person is made. Miss with that

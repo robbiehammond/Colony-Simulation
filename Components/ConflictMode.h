@@ -6,7 +6,6 @@ public:
 	void fillNameArray();
 	void setSpawnPoints();
 	Person findClose(Person& prim);
-	bool clickInRange(sf::RectangleShape& object);
 	bool spawnerClose(Person& prim);
 	void getUserInput(sf::RenderWindow& window, sf::Event& event);
 	void updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time);

@@ -16,8 +16,7 @@ Colony _otherCol(sf::Color::White);
 
 bool allPlaced = false;
 
-string assignableNames[100];
-
+vector<string> assignableNames; //currently 1188 size, can be increased. Seems like it is still running fast enough for me, and it happens before the game starts, so I don't think I need to worry too much about runtime.
 
 //keep all the spawners here - 
 vector<sf::RectangleShape> spawners;
@@ -29,22 +28,16 @@ ConflictMode::ConflictMode(sf::RenderWindow& _window, sf::Font& _font, Map _map)
 	playGame();
 }
 
+//fills the name array from the name file 
 void ConflictMode::fillNameArray()
 {
 	string curline;
 	ifstream nameFile("Assignable Names.txt");
 	if (nameFile.is_open()) {
-		int i = 0;
 		while (getline(nameFile, curline)) {
-			assignableNames[i] = curline;
-			i++;
+			assignableNames.push_back(curline);
 		}
 		nameFile.close();
-	}
-	//just checking to make sure the names get properly assinged into the array, which it seems like it does. Success! 
-	for (int i = 0; i < sizeof(assignableNames) / sizeof(assignableNames[0]); i++) {
-		if (assignableNames[i].size() > 1)
-			cout << assignableNames[i] << endl;
 	}
 }
 
@@ -90,21 +83,28 @@ Person ConflictMode::findClose(Person& prim)
 
 	float curMinDist = 400; //settable min detection distance
 
+	//points to a close (but not necessarily closest) node. Starts of as the current node that's searching.
 	Person* saveNode = &prim;
 
 	for (auto i = 0; i < ar.size(); i++) {
 		const float curNodeDist = prim.distance(ar[i]);
+		//if this node is close enough to be found and this node isn't itself, continue
 		if (curNodeDist < curMinDist && curNodeDist != 0) {
+			//if they're the same color, possibly spread disease
 			if (prim.myCol.color == ar[i].myCol.color) {
 				int random = 1 + (rand() % 20);
 				if (random == 1) {
-					prim.spreadDisease(ar[i]);
+					if (prim.spreadDisease(ar[i])) {
+						updateStatusBar(bar, prim.name + " spread disease to " + ar[i].name);
+					}
 				}
 			}
+			//the close node is now an actual close node, and not just the searching node
 			saveNode = &ar[i];
 			break;
 		}
 	}
+	//if we didn't find a close one and the close one is just this one, return a node out of bounds - other methods will interpret this 
 	if (saveNode->shape.getPosition() == prim.shape.getPosition()) {
 		return placeholder;
 	}
@@ -112,6 +112,8 @@ Person ConflictMode::findClose(Person& prim)
 		return *saveNode;
 }
 
+/*
+//returns if the place clicked to place the spawner is in a valid position or not (might have to edit the bounds of this a little bit).
 bool ConflictMode::clickInRange(sf::RectangleShape& object)
 {
 	sf::Vector2f mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
@@ -121,6 +123,7 @@ bool ConflictMode::clickInRange(sf::RectangleShape& object)
 	else
 		return false;
 }
+*/
 
 //if a spawner is close (maybe within 50?), ignore all other nodes and go to spawner 
 bool ConflictMode::spawnerClose(Person& prim)
@@ -192,7 +195,7 @@ void ConflictMode::moveNode(Person& prim, Person& closest)
 	else if (spawners.size() == 1 && spawners[0].getFillColor() != prim.myCol.color) { //only spawner on board matches doesn't this person's color 
 		findSpawner(prim); //find and go to close spawner
 	}
-	else if (spawners.size() == 1 && spawners[0].getFillColor() == prim.myCol.color) { //and there are still other people around
+	else if (spawners.size() == 1 && spawners[0].getFillColor() == prim.myCol.color) { //and there are still other people around. Might wanna put the else back
 		found = findHardClose(prim);
 	}
 	//if none of the above happened, then found needs to be set to false to do below 
@@ -213,6 +216,8 @@ void ConflictMode::fillAr(int x, int y, Colony col)
 	}
 	//make sure they're being filled in a correct map range
 	if (p.checkBounds(p.position.x, p.position.y)) {
+		int nameIndex = rand() % assignableNames.size();
+		p.assignName(assignableNames[nameIndex]);
 		ar.push_back(p);
 	}
 }
@@ -287,7 +292,7 @@ void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 				else {
 					Person p = findClose(i); //we're making a copy, maybe this is what's causing so much lag tbh 
 					if (i.generateDisease()) //also generate disease should just in the mutate method 
-						updateStatusBar(bar, to_string(i.health));
+						updateStatusBar(bar, i.name + " from " + " [insert col] " + " generated a disease!" ); //make a to string method in col
 					mutate(i);	
 					moveNode(i, p); //nullptr
 					findSpawner(i);
@@ -348,11 +353,12 @@ void ConflictMode::playGame()
 
 		//update status bar
 		drawStatusBar(bar);
-		updateStatusBar(bar, to_string(ar.size())); //this isn't displayed bc it's getting overriden too fast
+		//updateStatusBar(bar, to_string(ar.size())); //this isn't displayed bc it's getting overriden too fast
 
 		if (event.type == event.MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left && !allPlaced) {
 			setSpawnPoints();
 		}
+
 		if (spawners.size() == 4)
 			allPlaced = true;
 
