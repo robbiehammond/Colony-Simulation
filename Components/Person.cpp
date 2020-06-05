@@ -20,6 +20,9 @@ Person::Person(float startX, float startY, Colony _col, Map _curMap)
 	shape.setFillColor(color);
 	shape.setRadius(radius);
 	myCol = _col;
+
+	name = ""; //to be initialized in conflict mode and left blank in sandbox mode
+
 }
 
 
@@ -211,17 +214,20 @@ bool Person::checkBounds(float x, float y)
 	return true;
 }
 
-void Person::generateDisease()
+
+//alter the rate at which disease spreads, bc it's a bit too fast right now 
+bool Person::generateDisease()
 {
 	//only generate disease if they're not already diseased 
 	if (!isDiseased) {
-		int random = 1 + (rand() % 1000);
+		int random = 1 + (rand() % 5000);
 		if (random == 2) {
 			isDiseased = true;
 			setDiseaseEffects();
-			cout << "Disease was gained" << endl;
+			return true;
 		}
 	}
+	return false;
 }
 
 void Person::setDiseaseEffects()
@@ -233,11 +239,13 @@ void Person::setDiseaseEffects()
 }
 
 //who we spread disease to is found through ConflictMode file
+//TODO - Make generating and spreading rates to be a little slower 
+//Also, maybe not make this void, and whenever disease is spread, put on the status bar "(this node) just spread disease to (this other node)"
 void Person::spreadDisease(Person& other)
 {
 	if (isDiseased && !other.isDiseased) {
-		int random = 1 + (rand() % 100); //maybe change this number later 
-		if (random == 5) {
+		int random = 1 + (rand() % 1); //maybe change this number later 
+		if (random == 1) {
 			other.isDiseased = true;
 			other.setDiseaseEffects();
 			cout << "disease was spread" << endl;

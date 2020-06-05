@@ -23,27 +23,6 @@ void GameMode::move(Person& p)
 	}
 }
 
-Person GameMode::findClose(Person& prim)
-{
-	Person placeholder(-10000, -100000, prim.myCol, prim.curMap);
-	
-	float curMinDist = 400; //settable min detection distance
-
-	Person* saveNode = &prim;
-
-	for (auto i = 0; i < ar.size(); i++) {
-		const float curNodeDist = prim.distance(ar[i]);
-		if (curNodeDist < curMinDist && curNodeDist != 0) {
-			saveNode = &ar[i];
-			break;
-		}
-	}
-	if (saveNode->shape.getPosition() == prim.shape.getPosition()) {
-		return placeholder;
-	}
-	else
-		return *saveNode;
-}
 
 bool GameMode::findHardClose(Person& prim)
 {
@@ -109,7 +88,27 @@ void GameMode::mutate(Person& person)
 	//make logic to possibly remove the disease through mutation
 }
 
-StatusBar::StatusBar(int x, int y)
+void GameMode::drawStatusBar(StatusBar& s)
 {
+	s.window.draw(s.outline);
+	s.window.draw(s.displayedText);
+}
 
+void GameMode::updateStatusBar(StatusBar& bar, string s)
+{
+	bar.displayedText.setString(s);
+}
+
+StatusBar::StatusBar(sf::RenderWindow& _window, sf::Font& _font)
+	: outline(sf::Vector2f(400, 25)), window(_window), font(_font)
+{
+	outline.setPosition(sf::Vector2f(440, 0));
+	outline.setFillColor(sf::Color::Black);
+	outline.setOutlineColor(sf::Color::White);
+	outline.setOutlineThickness(2);
+
+	displayedText.setPosition(440, 0);
+	displayedText.setFont(font);
+	displayedText.setCharacterSize(20);
+	displayedText.setString("Place your 4 spawners where you'd like");
 }

@@ -1,6 +1,10 @@
 #include "ConflictMode.h"
 #include <iostream>
+#include <fstream>
 #include <vector>
+
+//TODO - assign each person their name upon spawn so I can reference them in the global events, then finish the status bar so I can display those global events. Then think of all the global events I can display, and then display them as necessary.
+
 
 using namespace std;
 
@@ -12,15 +16,36 @@ Colony _otherCol(sf::Color::White);
 
 bool allPlaced = false;
 
+string assignableNames[100];
 
 
 //keep all the spawners here - 
 vector<sf::RectangleShape> spawners;
 
 ConflictMode::ConflictMode(sf::RenderWindow& _window, sf::Font& _font, Map _map)
-	: window(_window), font(_font), map(_map)
+	: window(_window), font(_font), map(_map), bar(_window, _font)
 {
+	fillNameArray();
 	playGame();
+}
+
+void ConflictMode::fillNameArray()
+{
+	string curline;
+	ifstream nameFile("Assignable Names.txt");
+	if (nameFile.is_open()) {
+		int i = 0;
+		while (getline(nameFile, curline)) {
+			assignableNames[i] = curline;
+			i++;
+		}
+		nameFile.close();
+	}
+	//just checking to make sure the names get properly assinged into the array, which it seems like it does. Success! 
+	for (int i = 0; i < sizeof(assignableNames) / sizeof(assignableNames[0]); i++) {
+		if (assignableNames[i].size() > 1)
+			cout << assignableNames[i] << endl;
+	}
 }
 
 //maybe not always have this be void 
@@ -57,6 +82,34 @@ void ConflictMode::setSpawnPoints()
 			}
 		}
 		//rect.setFillColor(curCol.color);
+}
+
+Person ConflictMode::findClose(Person& prim)
+{
+	Person placeholder(-10000, -100000, prim.myCol, prim.curMap);
+
+	float curMinDist = 400; //settable min detection distance
+
+	Person* saveNode = &prim;
+
+	for (auto i = 0; i < ar.size(); i++) {
+		const float curNodeDist = prim.distance(ar[i]);
+		if (curNodeDist < curMinDist && curNodeDist != 0) {
+			if (prim.myCol.color == ar[i].myCol.color) {
+				int random = 1 + (rand() % 20);
+				if (random == 1) {
+					prim.spreadDisease(ar[i]);
+				}
+			}
+			saveNode = &ar[i];
+			break;
+		}
+	}
+	if (saveNode->shape.getPosition() == prim.shape.getPosition()) {
+		return placeholder;
+	}
+	else
+		return *saveNode;
 }
 
 bool ConflictMode::clickInRange(sf::RectangleShape& object)
@@ -172,7 +225,6 @@ void ConflictMode::spawn()
 		for (unsigned i = 0; i < spawners.size(); i++) {
 			Colony curCol(spawners[i].getFillColor());
 
-
 			const int num = (1.0 / (2.0 * spawners[i].getSize().x)) * 10000; //100 at normal size
 			int random = 1 + (rand() % num); 
 			int random2 = 1 + (rand() % num);
@@ -233,8 +285,9 @@ void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 					findSpawner(i);
 				}
 				else {
-					Person p = findClose(i); //we're making a copy
-					//i.generateDisease();
+					Person p = findClose(i); //we're making a copy, maybe this is what's causing so much lag tbh 
+					if (i.generateDisease()) //also generate disease should just in the mutate method 
+						updateStatusBar(bar, to_string(i.health));
 					mutate(i);	
 					moveNode(i, p); //nullptr
 					findSpawner(i);
@@ -262,12 +315,13 @@ void ConflictMode::removeAndShuffle(sf::Time& elapsed_time)
 	}
 }
 
-void ConflictMode::checkForDisease(Person& prim)
-{
-	if (prim.isDiseased) {
 
-	}
+
+void ConflictMode::getGlobalEvents()
+{
+
 }
+
 
 void ConflictMode::playGame()
 {
@@ -291,6 +345,10 @@ void ConflictMode::playGame()
 
 		//udpating happens
 		window.draw(map);
+
+		//update status bar
+		drawStatusBar(bar);
+		updateStatusBar(bar, to_string(ar.size())); //this isn't displayed bc it's getting overriden too fast
 
 		if (event.type == event.MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left && !allPlaced) {
 			setSpawnPoints();

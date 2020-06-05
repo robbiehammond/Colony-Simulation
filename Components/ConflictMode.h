@@ -3,7 +3,9 @@
 class ConflictMode : public GameMode {
 public:
 	ConflictMode(sf::RenderWindow& _window, sf::Font& _font, Map _map);
+	void fillNameArray();
 	void setSpawnPoints();
+	Person findClose(Person& prim);
 	bool clickInRange(sf::RectangleShape& object);
 	bool spawnerClose(Person& prim);
 	void getUserInput(sf::RenderWindow& window, sf::Event& event);
@@ -13,9 +15,10 @@ public:
 	void spawn();
 	void findSpawner(Person& prim);
 	void removeAndShuffle(sf::Time& elapsed_time);
-	void checkForDisease(Person& prim);
+	void getGlobalEvents();
 	void playGame();
 private:
+	StatusBar bar;
 	sf::RenderWindow& window;
 	sf::Font& font;
 	Map map;
