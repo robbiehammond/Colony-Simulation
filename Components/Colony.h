@@ -8,5 +8,6 @@ class Colony
 {
 public:
 	Colony(sf::Color _color);
+	string to_string();
 	sf::Color color;
 };

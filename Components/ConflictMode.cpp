@@ -22,7 +22,7 @@ vector<string> assignableNames; //currently 1188 size, can be increased. Seems l
 vector<sf::RectangleShape> spawners;
 
 ConflictMode::ConflictMode(sf::RenderWindow& _window, sf::Font& _font, Map _map)
-	: window(_window), font(_font), map(_map), bar(_window, _font)
+	: window(_window), font(_font), map(_map), bar(_window, _font), button(_window, _font)
 {
 	fillNameArray();
 	playGame();
@@ -112,18 +112,6 @@ Person ConflictMode::findClose(Person& prim)
 		return *saveNode;
 }
 
-/*
-//returns if the place clicked to place the spawner is in a valid position or not (might have to edit the bounds of this a little bit).
-bool ConflictMode::clickInRange(sf::RectangleShape& object)
-{
-	sf::Vector2f mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-	sf::FloatRect bound = object.getGlobalBounds();
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && bound.contains(mouseCoords))
-		return true;
-	else
-		return false;
-}
-*/
 
 //if a spawner is close (maybe within 50?), ignore all other nodes and go to spawner 
 bool ConflictMode::spawnerClose(Person& prim)
@@ -167,30 +155,13 @@ void ConflictMode::getUserInput(sf::RenderWindow& window, sf::Event& event)
 //we're double passing addresses!
 void ConflictMode::moveNode(Person& prim, Person& closest)
 {
-	bool found = false;
+	bool found = false; //if a node has been found or not 
 	float dist = prim.distance(closest);
+
+	//if the closest node isn't this node, isn't extremely far away, and it has a different color, move towards it
 	if (dist != 0 && dist < 1000 && prim.myCol.color != closest.myCol.color) {
 		found = true;
-		int i = 0;
-		while (i < 3) {
-			float dx = closest.position.x - prim.position.x;
-			float dy = closest.position.y - prim.position.y;
-			if (dx > 0)
-				prim.moveRight();
-			if (dx < 0)
-				prim.moveLeft();
-			if (dy > 0)
-				prim.moveDown();
-			if (dy < 0)
-				prim.moveUp();
-			if (prim.shape.getGlobalBounds().intersects(closest.shape.getGlobalBounds()) && closest.shape.getPosition() != prim.shape.getPosition()) {
-				prim.updateHealth(prim.health - closest.damage);
-				if (prim.damage > 1)
-					prim.damage -= 1;
-				closest.updateHealth(closest.health - 1);
-			}
-			i++;
-		}
+		moveTowardNode(prim, closest);
 	}
 	else if (spawners.size() == 1 && spawners[0].getFillColor() != prim.myCol.color) { //only spawner on board matches doesn't this person's color 
 		findSpawner(prim); //find and go to close spawner
@@ -290,11 +261,11 @@ void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 					findSpawner(i);
 				}
 				else {
-					Person p = findClose(i); //we're making a copy, maybe this is what's causing so much lag tbh 
-					if (i.generateDisease()) //also generate disease should just in the mutate method 
-						updateStatusBar(bar, i.name + " from " + " [insert col] " + " generated a disease!" ); //make a to string method in col
+					Person p = findClose(i); //a pointer would work better so I don't need to make a new object, but there's some bug with the SFML source code with the getPointCount function. Not too much I can do about that, but this seems to avoid the probelm 
+					if (i.generateDisease())
+						updateStatusBar(bar, i.name + " from " + i.myCol.to_string() + " Colony generated a disease!");
 					mutate(i);	
-					moveNode(i, p); //nullptr
+					moveNode(i, p); 
 					findSpawner(i);
 				}
 			}
@@ -327,6 +298,17 @@ void ConflictMode::getGlobalEvents()
 
 }
 
+bool ConflictMode::detectExitClick(exitButton button)
+{
+	sf::Vector2f mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+	sf::FloatRect bound = button.outline.getGlobalBounds();
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && bound.contains(mouseCoords))
+		return true;
+	else
+		return false;
+}
+
+
 
 void ConflictMode::playGame()
 {
@@ -337,7 +319,8 @@ void ConflictMode::playGame()
 	maptext.loadFromFile(map.to_string());
 	sf::Sprite map(maptext);
 
-	while (window.isOpen()) {
+	while (window.isOpen() && !detectExitClick(button)) {
+
 
 		elapsed_time += r.restart();
 		sf::Event event;
@@ -351,8 +334,9 @@ void ConflictMode::playGame()
 		//udpating happens
 		window.draw(map);
 
-		//update status bar
+		//update status bar and button
 		drawStatusBar(bar);
+		drawExitButton(button);
 		//updateStatusBar(bar, to_string(ar.size())); //this isn't displayed bc it's getting overriden too fast
 
 		if (event.type == event.MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left && !allPlaced) {
@@ -380,4 +364,8 @@ void ConflictMode::playGame()
 		//remove and shuffle
 		removeAndShuffle(elapsed_time);
 	}
+	//clear this game so the next game can start properly
+	ar.clear();
+	spawners.clear();
+	allPlaced = false;
 }

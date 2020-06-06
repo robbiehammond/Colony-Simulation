@@ -24,6 +24,7 @@ void GameMode::move(Person& p)
 }
 
 
+//unlike the other findClose function where a placeholder could be returned, this one always makes finds and moves a node towards another one as long as there are more nodes of different colors left on the screen
 bool GameMode::findHardClose(Person& prim)
 {
 
@@ -43,30 +44,12 @@ bool GameMode::findHardClose(Person& prim)
 	if (saveNode->shape.getPosition() == prim.shape.getPosition()) {
 		return false;
 	}
+	//extra logic to make sure other nodes are found, if there are other nodes on the game board
 	else {
 		Person closest = *saveNode;
 		int dist = prim.distance(closest);
 		if (dist != 0 && dist < 1000 && prim.myCol.color != closest.myCol.color) {
-			int i = 0;
-			while (i < 3) {
-				float dx = closest.position.x - prim.position.x;
-				float dy = closest.position.y - prim.position.y;
-				if (dx > 0)
-					prim.moveRight();
-				if (dx < 0)
-					prim.moveLeft();
-				if (dy > 0)
-					prim.moveDown();
-				if (dy < 0)
-					prim.moveUp();
-				if (prim.shape.getGlobalBounds().intersects(closest.shape.getGlobalBounds()) && closest.shape.getPosition() != prim.shape.getPosition()) {
-					prim.updateHealth(prim.health - closest.damage);
-					if (prim.damage > 1)
-						prim.damage -= 1;
-					closest.updateHealth(closest.health - 1);
-				}
-				i++;
-			}
+			moveTowardNode(prim, closest);
 		}
 	}
 	return true;
@@ -88,6 +71,31 @@ void GameMode::mutate(Person& person)
 	//make logic to possibly remove the disease through mutation
 }
 
+//this could go in person class, but I'll leave that for if I feel like doing it later 
+void GameMode::moveTowardNode(Person& prim, Person& closest)
+{
+	int i = 0;
+	while (i < 3) {
+		float dx = closest.position.x - prim.position.x;
+		float dy = closest.position.y - prim.position.y;
+		if (dx > 0)
+			prim.moveRight();
+		if (dx < 0)
+			prim.moveLeft();
+		if (dy > 0)
+			prim.moveDown();
+		if (dy < 0)
+			prim.moveUp();
+		if (prim.shape.getGlobalBounds().intersects(closest.shape.getGlobalBounds()) && closest.shape.getPosition() != prim.shape.getPosition()) {
+			prim.updateHealth(prim.health - closest.damage);
+			if (prim.damage > 1)
+				prim.damage -= 1;
+			closest.updateHealth(closest.health - 1);
+		}
+		i++;
+	}
+}
+
 void GameMode::drawStatusBar(StatusBar& s)
 {
 	s.window.draw(s.outline);
@@ -99,16 +107,39 @@ void GameMode::updateStatusBar(StatusBar& bar, string s)
 	bar.displayedText.setString(s);
 }
 
-StatusBar::StatusBar(sf::RenderWindow& _window, sf::Font& _font)
-	: outline(sf::Vector2f(400, 25)), window(_window), font(_font)
+void GameMode::drawExitButton(exitButton& button)
 {
-	outline.setPosition(sf::Vector2f(440, 0));
+	button.window.draw(button.outline);
+	button.window.draw(button.closeText);
+}
+
+
+
+StatusBar::StatusBar(sf::RenderWindow& _window, sf::Font& _font)
+	: outline(sf::Vector2f(450, 25)), window(_window), font(_font)
+{
+	outline.setPosition(sf::Vector2f(415, 0));
 	outline.setFillColor(sf::Color::Black);
 	outline.setOutlineColor(sf::Color::White);
 	outline.setOutlineThickness(2);
 
-	displayedText.setPosition(440, 0);
+	displayedText.setPosition(415, 0);
 	displayedText.setFont(font);
 	displayedText.setCharacterSize(20);
 	displayedText.setString("Place your 4 spawners where you'd like");
 }
+
+exitButton::exitButton(sf::RenderWindow& _window, sf::Font& _font)
+	: outline(sf::Vector2f(25, 25)), window(_window), font(_font)
+{
+	outline.setPosition(sf::Vector2f(1255, 0));
+	outline.setFillColor(sf::Color::Black);
+	outline.setOutlineColor(sf::Color::White);
+	outline.setOutlineThickness(2);
+	
+	closeText.setPosition(sf::Vector2f(1255, 0));
+	closeText.setFont(font);
+	closeText.setCharacterSize(25);
+	closeText.setString("X");
+}
+

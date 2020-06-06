@@ -15,8 +15,10 @@ public:
 	void findSpawner(Person& prim);
 	void removeAndShuffle(sf::Time& elapsed_time);
 	void getGlobalEvents();
+	bool detectExitClick(exitButton button);
 	void playGame();
 private:
+	exitButton button;
 	StatusBar bar;
 	sf::RenderWindow& window;
 	sf::Font& font;

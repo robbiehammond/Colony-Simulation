@@ -10,8 +10,10 @@ public:
 	void moveNode(Person& prim, Person& closest);
 	void removeAndShuffle(sf::Time& elapsed_time);
 	void updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time);
+	bool detectExitClick(exitButton button);
 	void playGame();
 private:
+	exitButton button;
 	sf::RenderWindow& window;
 	sf::Font& font;
 	Map map;

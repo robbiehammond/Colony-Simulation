@@ -7,7 +7,7 @@ Colony blueCol(sf::Color::Blue);
 Colony animalColony(sf::Color::Yellow);
 
 SandboxMode::SandboxMode(sf::RenderWindow& _window, sf::Font& _font, Map _map)
-	: window(_window), font(_font), map(_map)
+	: window(_window), font(_font), map(_map), button(_window, _font)
 {
 	playGame();
 }
@@ -62,30 +62,10 @@ void SandboxMode::moveNode(Person& prim, Person& closest)
 {
 	float dist = prim.distance(closest);
 	if (dist != 0 && dist < 1000 && prim.myCol.color != closest.myCol.color) {
-		int i = 0;
-		while (i < 3) {
-			float dx = closest.position.x - prim.position.x;
-			float dy = closest.position.y - prim.position.y;
-			if (dx > 0)
-				prim.moveRight();
-			if (dx < 0)
-				prim.moveLeft();
-			if (dy > 0)
-				prim.moveDown();
-			if (dy < 0)
-				prim.moveUp();
-			if (prim.shape.getGlobalBounds().intersects(closest.shape.getGlobalBounds()) && closest.shape.getPosition() != prim.shape.getPosition()) {
-				prim.updateHealth(prim.health - closest.damage);
-				if (prim.damage > 1)
-					prim.damage -= 1;
-				closest.updateHealth(closest.health - 1);
-			}
-			i++;
-		}
+		moveTowardNode(prim, closest);
 	}
 	else
 	{
-		//abstract this out of gamemode and put it in sandboxmode, bc in conflict mode I gotta search for spawners too
 		prim.moveToCenter();
 	}
 }
@@ -121,6 +101,16 @@ void SandboxMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 			window.draw(i.shape);
 		}
 	}
+}
+
+bool SandboxMode::detectExitClick(exitButton button)
+{
+	sf::Vector2f mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+	sf::FloatRect bound = button.outline.getGlobalBounds();
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && bound.contains(mouseCoords))
+		return true;
+	else
+		return false;
 }
 
 void SandboxMode::getUserInput(sf::RenderWindow& window, sf::Event& event)
@@ -167,7 +157,7 @@ void SandboxMode::playGame()
 	sf::Clock r;
 	sf::Time elapsed_time;
 
-	while (window.isOpen())
+	while (window.isOpen() && !detectExitClick(button))
 	{
 
 		elapsed_time += r.restart();
@@ -180,9 +170,9 @@ void SandboxMode::playGame()
 
 		window.clear();
 
-
+		
 		window.draw(map);
-
+		drawExitButton(button);
 
 		//update game 
 		updateNodes(window, elapsed_time);
@@ -191,7 +181,7 @@ void SandboxMode::playGame()
 		//after the display
 		removeAndShuffle(elapsed_time);
 	}
-	//on close 
-	cout << "Amount of people left: " << ar.size();
+	//on close
+	ar.clear();
 
 }
