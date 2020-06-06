@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AboutScreen.cpp" />
     <ClCompile Include="Colony.cpp" />
     <ClCompile Include="ConflictMode.cpp" />
     <ClCompile Include="GameMode.cpp" />
@@ -157,6 +158,7 @@
     <ClCompile Include="TitleScreen.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AboutScreen.h" />
     <ClInclude Include="Colony.h" />
     <ClInclude Include="ConflictMode.h" />
     <ClInclude Include="GameMode.h" />

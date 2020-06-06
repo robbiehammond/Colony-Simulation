@@ -172,6 +172,11 @@ void TitleScreen::loadScreen()
 				playingGame = true;
 				selectedMode = Conflict;
 			}
+			if (clickInRange(aboutBox)) 
+			{
+				playingGame = true;
+				selectedMode = About;
+			}
 
 		setColorOnClick(map0box, map1box, map2box, map3box);
 

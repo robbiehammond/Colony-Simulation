@@ -337,7 +337,6 @@ void ConflictMode::playGame()
 		//update status bar and button
 		drawStatusBar(bar);
 		drawExitButton(button);
-		//updateStatusBar(bar, to_string(ar.size())); //this isn't displayed bc it's getting overriden too fast
 
 		if (event.type == event.MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left && !allPlaced) {
 			setSpawnPoints();

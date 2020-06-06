@@ -5,6 +5,7 @@
 enum Mode {
 	Sandbox,
 	Conflict,
+	About,
 	None,
 };
 

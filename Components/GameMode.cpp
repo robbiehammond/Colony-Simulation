@@ -139,7 +139,7 @@ exitButton::exitButton(sf::RenderWindow& _window, sf::Font& _font)
 	
 	closeText.setPosition(sf::Vector2f(1255, 0));
 	closeText.setFont(font);
-	closeText.setCharacterSize(25);
-	closeText.setString("X");
+	closeText.setCharacterSize(20);
+	closeText.setString(" X"); //space there for formatting 
 }
 

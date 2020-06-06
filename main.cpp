@@ -6,6 +6,7 @@
 #include "TitleScreen.h"
 #include "SandboxMode.h"
 #include "ConflictMode.h"
+#include "AboutScreen.h"
 
 //@TODO - Make to_string method for colonies to get the string format of the name of the colony (so I can put it in the status bar)
 //Put button on the screen, if it is clicked, the playGame() function breaks, thus the loop in main sets the selected game to None, thus the loop continues and (theoretically) the title screen is reloaded.
@@ -15,7 +16,7 @@
 specific plans:
 	make the to_string function in colony - finished
 	confirm finding algorithm is decent, divide it into multiple functions - finished
-	make a way to exit game 
+	make a way to exit game - finished
 	make "about" section on title screen
 	make 3rd map!
 	get status bar displaying important events, and make it so that it is easy to add new events to display in case I add anything in the future 
@@ -45,6 +46,9 @@ int main()
 		sf::sleep(sf::milliseconds(250));
 		if (selectedMode == Sandbox) {
 			SandboxMode sandbox(window, font, theMap);
+		}
+		if (selectedMode == About) {
+			AboutScreen about(window, font);
 		}
 		if (selectedMode == Conflict) {
 			ConflictMode conflict(window, font, theMap);
