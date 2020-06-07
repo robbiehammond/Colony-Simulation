@@ -4,6 +4,23 @@
 
 
 
+string GameMode::sfColorToString(sf::Color color)
+{
+	//can't use a switch statement unfortunately 
+	if (color == sf::Color::Red)
+		return "Red";
+	else if (color == sf::Color::Blue)
+		return "Blue";
+	else if (color == sf::Color::Green)
+		return "Green";
+	else if (color == sf::Color::Yellow)
+		return "Yellow";
+	else if (color == sf::Color::White)
+		return "White";
+	else
+		return "[Invalid Game Color Input]";
+}
+
 void GameMode::move(Person& p)
 {
 	int random = 1 + (rand() % 4);

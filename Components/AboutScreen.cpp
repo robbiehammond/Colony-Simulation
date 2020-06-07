@@ -11,8 +11,19 @@ AboutScreen::AboutScreen(sf::RenderWindow& _window, sf::Font& _font)
 	displayScreen();
 }
 
+bool AboutScreen::detectBackClick(sf::RectangleShape buttonOutline)
+{
+	sf::Vector2f mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+	sf::FloatRect bound = buttonOutline.getGlobalBounds();
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && bound.contains(mouseCoords))
+		return true;
+	else
+		return false;
+}
+
 void AboutScreen::displayScreen()
 {
+	bool backPressed = false;
 	text.setPosition(sf::Vector2f(100, 100));
 	sf::RectangleShape backButton(sf::Vector2f(50, 25));
 	backButton.setPosition(625, 500);
@@ -26,16 +37,18 @@ void AboutScreen::displayScreen()
 	backText.setPosition(628, 500);
 	backText.setCharacterSize(20);
 
-	while (window.isOpen()) {
+	while (window.isOpen() && !backPressed) {
 		sf::Event event;
 		while (window.pollEvent(event)) {
 			//make logic to detect if the back button was pressed
-
 			if (event.type == sf::Event::Closed)
 			{
 				window.close();
 			}
 		}
+
+		if (detectBackClick(backButton))
+			backPressed = true;
 		window.clear();
 		window.draw(text);
 

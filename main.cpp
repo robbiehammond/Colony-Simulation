@@ -17,7 +17,7 @@ specific plans:
 	make the to_string function in colony - finished
 	confirm finding algorithm is decent, divide it into multiple functions - finished
 	make a way to exit game - finished
-	make "about" section on title screen
+	make "about" section on title screen - finished
 	make 3rd map!
 	get status bar displaying important events, and make it so that it is easy to add new events to display in case I add anything in the future 
 	add power-ups (if there is a powerup on the screen and it is within like 300 units, go to it - there should be a lot of them going to it at once)
@@ -35,9 +35,9 @@ Map theMap(Map0);
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1280, 720), "My window", sf::Style::Close);
+	sf::Font font;
+	font.loadFromFile("arial.ttf"); //choose a more interesting font later
 	while (window.isOpen()) {
-		sf::Font font;
-		font.loadFromFile("arial.ttf"); //choose a more interesting font later
 
 		TitleScreen title(window, font);
 		selectedMode = title.getSelectedMode();

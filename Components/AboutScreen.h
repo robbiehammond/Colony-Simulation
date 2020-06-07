@@ -4,6 +4,7 @@
 class AboutScreen {
 public:
 	AboutScreen(sf::RenderWindow& _window, sf::Font& _font);
+	bool detectBackClick(sf::RectangleShape buttonOutline);
 	void displayScreen();
 private:
 	sf::RenderWindow& window;

@@ -3,7 +3,13 @@
 #include <fstream>
 #include <vector>
 
-//TODO - assign each person their name upon spawn so I can reference them in the global events, then finish the status bar so I can display those global events. Then think of all the global events I can display, and then display them as necessary.
+/*
+global event possibilities
+-whenever a spawner is removed - finished
+-whenever all members of a colony die
+-whenever a powerup is placed on the board
+-Whenever there is just 2 colonies left, say which colony is in the lead
+*/
 
 
 using namespace std;
@@ -20,6 +26,8 @@ vector<string> assignableNames; //currently 1188 size, can be increased. Seems l
 
 //keep all the spawners here - 
 vector<sf::RectangleShape> spawners;
+
+sf::RectangleShape powerUp(sf::Vector2f(25,25));
 
 ConflictMode::ConflictMode(sf::RenderWindow& _window, sf::Font& _font, Map _map)
 	: window(_window), font(_font), map(_map), bar(_window, _font), button(_window, _font)
@@ -92,7 +100,7 @@ Person ConflictMode::findClose(Person& prim)
 		if (curNodeDist < curMinDist && curNodeDist != 0) {
 			//if they're the same color, possibly spread disease
 			if (prim.myCol.color == ar[i].myCol.color) {
-				int random = 1 + (rand() % 20);
+				int random = 1 + (rand() % 25);
 				if (random == 1) {
 					if (prim.spreadDisease(ar[i])) {
 						updateStatusBar(bar, prim.name + " spread disease to " + ar[i].name);
@@ -114,13 +122,29 @@ Person ConflictMode::findClose(Person& prim)
 
 
 //if a spawner is close (maybe within 50?), ignore all other nodes and go to spawner 
-bool ConflictMode::spawnerClose(Person& prim)
+bool ConflictMode::otherSpawnerClose(Person& prim)
 {
 	int x = prim.shape.getPosition().x;
 	int y = prim.shape.getPosition().y;
 	for (unsigned i = 0; i < spawners.size(); i++) {
 		if (abs(spawners[i].getPosition().x - x) < 100 && abs(spawners[i].getPosition().y - y) < 100 && spawners[i].getFillColor() != prim.myCol.color) {
 			//cout << "true was found";
+			return true;
+		}
+	}
+	return false;
+}
+
+//ununsed for now, but might not always be that way
+bool ConflictMode::ourSpawnerClose(Person& prim)
+{
+	int x = prim.shape.getPosition().x;
+	int y = prim.shape.getPosition().y;
+	for (unsigned i = 0; i < spawners.size(); i++) {
+		//need to be a bit closer to our own spawner in order to return true
+		//let's start with 50 and see how it goes
+		if (abs(spawners[i].getPosition().x - x) < 25 && abs(spawners[i].getPosition().y - y) < 25 && spawners[i].getFillColor() == prim.myCol.color) {
+			cout << prim.name + " from " + sfColorToString(prim.myCol.color) + " was close enough to their spawner" << endl;
 			return true;
 		}
 	}
@@ -158,6 +182,8 @@ void ConflictMode::moveNode(Person& prim, Person& closest)
 	bool found = false; //if a node has been found or not 
 	float dist = prim.distance(closest);
 
+	//TODO - found seems to be a possible problem, bc lots of people are just moving to center when there's really no good reason to do so just yet. Going to the center should only really happen when there is truly no one else on the board.
+
 	//if the closest node isn't this node, isn't extremely far away, and it has a different color, move towards it
 	if (dist != 0 && dist < 1000 && prim.myCol.color != closest.myCol.color) {
 		found = true;
@@ -166,7 +192,7 @@ void ConflictMode::moveNode(Person& prim, Person& closest)
 	else if (spawners.size() == 1 && spawners[0].getFillColor() != prim.myCol.color) { //only spawner on board matches doesn't this person's color 
 		findSpawner(prim); //find and go to close spawner
 	}
-	else if (spawners.size() == 1 && spawners[0].getFillColor() == prim.myCol.color) { //and there are still other people around. Might wanna put the else back
+	else if (spawners.size() == 1 && spawners[0].getFillColor() == prim.myCol.color) { //and there are still other people around.
 		found = findHardClose(prim);
 	}
 	//if none of the above happened, then found needs to be set to false to do below 
@@ -175,6 +201,7 @@ void ConflictMode::moveNode(Person& prim, Person& closest)
 	}
 	if (!found) { //only happens when there is no one else to kill
 		prim.moveToCenter();
+		cout << "here" + sfColorToString(prim.myCol.color) << endl;;
 		}
 }
 
@@ -240,10 +267,10 @@ void ConflictMode::findSpawner(Person& prim)
 			if (dy < 0)
 				prim.moveUp();
 			if (prim.shape.getGlobalBounds().intersects(spawners[closest].getGlobalBounds()) && spawners[closest].getFillColor() != prim.myCol.color) {
+				//make this a bit more complex than simply removing 5 each time it is hit. Maybe make it based on the person's strength/health?
 				curScale.x = curScale.x - 5;
 				curScale.y = curScale.y - 5;
 				spawners[closest].setSize(curScale);
-				cout << spawners[closest].getSize().x << " " << spawners[closest].getSize().y << endl;
 			}
 			i++;
 		}
@@ -257,7 +284,7 @@ void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 		for (auto& i : ar)
 		{
 			if (elapsed_time.asMilliseconds() % 100 == 0) {
-				if (spawnerClose(i)) {
+				if (otherSpawnerClose(i)) {
 					findSpawner(i);
 				}
 				else {
@@ -275,6 +302,20 @@ void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 	}
 }
 
+void ConflictMode::updateSpawners(sf::RenderWindow& window)
+{
+	int spawnerSize = spawners.size();
+	for (int i = 0; i < spawnerSize; i++) {
+		spawn();
+		if (spawners[i].getSize().x <= 0 && spawners[i].getSize().y <= 0) {
+			removeSpawner(i);
+			spawnerSize = spawners.size();
+		}
+		else
+			window.draw(spawners[i]);
+	}
+}
+
 void ConflictMode::removeAndShuffle(sf::Time& elapsed_time)
 {
 	int size = ar.size();
@@ -286,17 +327,11 @@ void ConflictMode::removeAndShuffle(sf::Time& elapsed_time)
 			size = ar.size();
 		}
 	}
-	if (elapsed_time.asMilliseconds() % 100) {
+	if (elapsed_time.asMilliseconds() % 200) {
 		random_shuffle(ar.begin(), ar.end());
 	}
 }
 
-
-
-void ConflictMode::getGlobalEvents()
-{
-
-}
 
 bool ConflictMode::detectExitClick(exitButton button)
 {
@@ -306,6 +341,35 @@ bool ConflictMode::detectExitClick(exitButton button)
 		return true;
 	else
 		return false;
+}
+
+void ConflictMode::removeSpawner(int spawnerIndex)
+{
+	string color = sfColorToString(spawners[spawnerIndex].getFillColor());
+	updateStatusBar(bar, color + "'s Colony has lost their spawner!");
+	spawners.erase(spawners.begin() + spawnerIndex);
+}
+
+void ConflictMode::placePowerUp(sf::RenderWindow& window)
+{
+	int random = 1 + (rand() % 100);
+	if (random == 5) {
+		int random2 = 1 + (rand() % 2);
+		int Xplace = 0; //to set
+		int Yplace = 0; //to set 
+		switch (random2) {
+		case 1:
+			//more power
+			powerUp.setFillColor(sf::Color::Magenta);
+			//find a in-range spot through random number generation, place powerup there
+			//fill in placement logic later 
+		case 2:
+			//more strength
+			powerUp.setFillColor(sf::Color::Cyan);
+			//same as before
+
+		}
+	}
 }
 
 
@@ -341,21 +405,10 @@ void ConflictMode::playGame()
 		if (event.type == event.MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left && !allPlaced) {
 			setSpawnPoints();
 		}
-
 		if (spawners.size() == 4)
 			allPlaced = true;
 
-		int spawnerSize = spawners.size();
-		for (int i = 0; i < spawnerSize; i++) {
-			spawn();
-			if (spawners[i].getSize().x <= 0 && spawners[i].getSize().y <= 0) {
-				spawners.erase(spawners.begin() + i);
-				spawnerSize = spawners.size();
-			}
-			else
-				window.draw(spawners[i]);
-		}
-
+		updateSpawners(window);
 		updateNodes(window, elapsed_time);
 
 		window.display();

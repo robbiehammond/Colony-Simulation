@@ -29,6 +29,7 @@ struct exitButton {
 //abstract class that holds stuff that all game modes share goes here
 class GameMode {
 public:
+	string sfColorToString(sf::Color color);
 	vector<Person> ar;
 	void move(Person& p);
 	virtual Person findClose(Person& prim) = 0;
