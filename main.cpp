@@ -8,10 +8,6 @@
 #include "ConflictMode.h"
 #include "AboutScreen.h"
 
-//@TODO - Make to_string method for colonies to get the string format of the name of the colony (so I can put it in the status bar)
-//Put button on the screen, if it is clicked, the playGame() function breaks, thus the loop in main sets the selected game to None, thus the loop continues and (theoretically) the title screen is reloaded.
-//Finish over weekend? The plan is to get it to a borderline finished state at least 
-
 /*
 specific plans:
 	make the to_string function in colony - finished
@@ -19,7 +15,7 @@ specific plans:
 	make a way to exit game - finished
 	make "about" section on title screen - finished
 	make 3rd map!
-	get status bar displaying important events, and make it so that it is easy to add new events to display in case I add anything in the future 
+	get status bar displaying important events, and make it so that it is easy to add new events to display in case I add anything in the future - finished
 	add power-ups (if there is a powerup on the screen and it is within like 300 units, go to it - there should be a lot of them going to it at once)
 	balance the mutations and diseases, so that the game is a bit more fair and things seem more random (ie it is actually entertaining to watch)
 	so end goal for the weekend - be "90%" done with this whole project, so we can move onto some machine learning as soon as possible.

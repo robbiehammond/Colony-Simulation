@@ -8,6 +8,7 @@ public:
 	Person findClose(Person& prim);
 	bool otherSpawnerClose(Person& prim);
 	bool ourSpawnerClose(Person& prim);
+	void checkIfColonyIsAlive();
 	void getUserInput(sf::RenderWindow& window, sf::Event& event);
 	void updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time);
 	void updateSpawners(sf::RenderWindow& window);

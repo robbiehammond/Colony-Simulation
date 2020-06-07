@@ -6,20 +6,31 @@
 /*
 global event possibilities
 -whenever a spawner is removed - finished
--whenever all members of a colony die
+-whenever all members of a colony die - fininshed 
 -whenever a powerup is placed on the board
--Whenever there is just 2 colonies left, say which colony is in the lead
 */
-
-
 using namespace std;
 
 Colony _redCol(sf::Color::Red);
+bool redColAlive = true;
+bool redDeathMessageDisplayed = false;
+
 Colony _greenCol(sf::Color::Green);
+bool greenColAlive = true;
+bool greenDeathMessageDisplayed = false;
+
 Colony _blueCol(sf::Color::Blue);
+bool blueColAlive = true;
+bool blueDeathMessageDisplayed = false;
+
 Colony _yellowColony(sf::Color::Yellow);
+bool yellowColAlive = true;
+bool yellowDeathMessageDisplayed = false;
+
+//animals
 Colony _otherCol(sf::Color::White);
 
+//set to true once all spanwers are placed 
 bool allPlaced = false;
 
 vector<string> assignableNames; //currently 1188 size, can be increased. Seems like it is still running fast enough for me, and it happens before the game starts, so I don't think I need to worry too much about runtime.
@@ -27,7 +38,9 @@ vector<string> assignableNames; //currently 1188 size, can be increased. Seems l
 //keep all the spawners here - 
 vector<sf::RectangleShape> spawners;
 
+//powerup to be placed 
 sf::RectangleShape powerUp(sf::Vector2f(25,25));
+bool powerUpPlaced = false;
 
 ConflictMode::ConflictMode(sf::RenderWindow& _window, sf::Font& _font, Map _map)
 	: window(_window), font(_font), map(_map), bar(_window, _font), button(_window, _font)
@@ -97,7 +110,7 @@ Person ConflictMode::findClose(Person& prim)
 	for (auto i = 0; i < ar.size(); i++) {
 		const float curNodeDist = prim.distance(ar[i]);
 		//if this node is close enough to be found and this node isn't itself, continue
-		if (curNodeDist < curMinDist && curNodeDist != 0) {
+		if (curNodeDist < curMinDist && curNodeDist != 0 && prim.myCol.color != ar[i].myCol.color) {
 			//if they're the same color, possibly spread disease
 			if (prim.myCol.color == ar[i].myCol.color) {
 				int random = 1 + (rand() % 25);
@@ -151,6 +164,41 @@ bool ConflictMode::ourSpawnerClose(Person& prim)
 	return false;
 }
 
+//this works, but it's kinda ugly
+void ConflictMode::checkIfColonyIsAlive()
+{
+	bool redSpawnerFound = false;
+	bool greenSpawnerFound = false;
+	bool blueSpawnerFound = false;
+	bool yellowSpawnerFound = false;
+	for (int i = 0; i < spawners.size(); i++) {
+		if (spawners[i].getFillColor() == sf::Color::Red) 
+			redSpawnerFound = true;
+		else if (spawners[i].getFillColor() == sf::Color::Green)
+			greenSpawnerFound = true;
+		else if (spawners[i].getFillColor() == sf::Color::Blue)
+			blueSpawnerFound = true;
+		else if (spawners[i].getFillColor() == sf::Color::Yellow)
+			yellowSpawnerFound = true;
+	}
+	if (!redSpawnerFound && !redColAlive && !redDeathMessageDisplayed) {
+		updateStatusBar(bar, "Red Colony is Eliminated!");
+		redDeathMessageDisplayed = true;
+	}
+	else if (!greenSpawnerFound && !greenColAlive && !greenDeathMessageDisplayed) {
+		updateStatusBar(bar, "Green Colony is Eliminated!");
+		greenDeathMessageDisplayed = true;
+	}
+	else if (!blueSpawnerFound && !blueColAlive && !blueDeathMessageDisplayed) {
+		updateStatusBar(bar, "Blue Colony is Eliminated!");
+		blueDeathMessageDisplayed = true;
+	}
+	else if (!yellowSpawnerFound && !yellowColAlive && !yellowDeathMessageDisplayed) {
+		updateStatusBar(bar, "Yellow Colony is Eliminated!");
+		yellowDeathMessageDisplayed = true;
+	}
+}
+
 void ConflictMode::getUserInput(sf::RenderWindow& window, sf::Event& event)
 {
 	if (event.type == sf::Event::Closed)
@@ -201,7 +249,6 @@ void ConflictMode::moveNode(Person& prim, Person& closest)
 	}
 	if (!found) { //only happens when there is no one else to kill
 		prim.moveToCenter();
-		cout << "here" + sfColorToString(prim.myCol.color) << endl;;
 		}
 }
 
@@ -280,9 +327,23 @@ void ConflictMode::findSpawner(Person& prim)
 
 void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 {
+	bool redCurAlive = false;
+	bool greenCurAlive = false;
+	bool blueCurAlive = false;
+	bool yellowCurAlive = false;
 	if (!ar.empty()) {
 		for (auto& i : ar)
 		{
+			//check if at least one person from a given colony is alive - if not found when looping through the entire array, the whole colony must be gone.
+			if (i.myCol.color == sf::Color::Red)
+				redCurAlive = true;
+			else if (i.myCol.color == sf::Color::Green)
+				greenCurAlive = true;
+			else if (i.myCol.color == sf::Color::Blue)
+				blueCurAlive = true;
+			else if (i.myCol.color == sf::Color::Yellow)
+				yellowCurAlive = true;
+
 			if (elapsed_time.asMilliseconds() % 100 == 0) {
 				if (otherSpawnerClose(i)) {
 					findSpawner(i);
@@ -299,6 +360,11 @@ void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 			move(i);
 			window.draw(i.shape);
 		}
+		redColAlive = redCurAlive;
+		greenColAlive = greenCurAlive;
+		blueColAlive = blueCurAlive;
+		yellowColAlive = yellowCurAlive;
+		checkIfColonyIsAlive();
 	}
 }
 
@@ -350,26 +416,36 @@ void ConflictMode::removeSpawner(int spawnerIndex)
 	spawners.erase(spawners.begin() + spawnerIndex);
 }
 
+//TODO - finish putting the powerup on the screen
 void ConflictMode::placePowerUp(sf::RenderWindow& window)
 {
-	int random = 1 + (rand() % 100);
-	if (random == 5) {
-		int random2 = 1 + (rand() % 2);
-		int Xplace = 0; //to set
-		int Yplace = 0; //to set 
-		switch (random2) {
-		case 1:
-			//more power
-			powerUp.setFillColor(sf::Color::Magenta);
-			//find a in-range spot through random number generation, place powerup there
-			//fill in placement logic later 
-		case 2:
-			//more strength
-			powerUp.setFillColor(sf::Color::Cyan);
-			//same as before
+	if (!powerUpPlaced) {
+		//keep doing this until we get valid coordinates
+		int random = 1 + (rand() % 100);
+		int Xplace = 1 + (rand() % 1250); //leaving a bit of room 
+		int Yplace = 1 + (rand() % 690);
 
+		Person placehold(Xplace, Yplace, _otherCol, map); //maybe move this out of the person class
+		if (random == 5 && placehold.checkBounds(Xplace, Yplace)) {
+			int random2 = 1 + (rand() % 2); //randomly chooses the powerup
+			switch (random2) {
+			case 1:
+				//more speed
+				powerUp.setPosition(sf::Vector2f(Xplace, Yplace));
+				powerUp.setFillColor(sf::Color::Magenta);
+				break;
+			case 2:
+				//more strength
+				powerUp.setPosition(sf::Vector2f(Xplace, Yplace));
+				powerUp.setFillColor(sf::Color::Cyan);
+				break;
+				//same as before
+
+			}
+			powerUpPlaced = true;
 		}
 	}
+	window.draw(powerUp);
 }
 
 
@@ -410,6 +486,7 @@ void ConflictMode::playGame()
 
 		updateSpawners(window);
 		updateNodes(window, elapsed_time);
+		placePowerUp(window);
 
 		window.display();
 
