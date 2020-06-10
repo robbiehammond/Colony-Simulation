@@ -10,15 +10,18 @@
 
 /*
 specific plans:
-	make the to_string function in colony - finished
-	confirm finding algorithm is decent, divide it into multiple functions - finished
-	make a way to exit game - finished
-	make "about" section on title screen - finished
-	make 3rd map!
-	get status bar displaying important events, and make it so that it is easy to add new events to display in case I add anything in the future - finished
-	add power-ups (if there is a powerup on the screen and it is within like 300 units, go to it - there should be a lot of them going to it at once)
-	balance the mutations and diseases, so that the game is a bit more fair and things seem more random (ie it is actually entertaining to watch)
-	so end goal for the weekend - be "90%" done with this whole project, so we can move onto some machine learning as soon as possible.
+	Weekend Over and some good progress was made- here's what we still need to do 
+
+	balance the mutations and diseases, so that the game is a bit more fair and things seem more random (ie it is actually entertaining to watch) (powerUps removed bc it caused too many bugs and it broke the "flow" of the gameplay) - Wednesday
+
+	edit moving algorithm so that if the node is close to their own spawner, and a close node is detected to also be close, hone in better on it - Thursday
+
+	generate wind! So when people move, they can go up fast, but down slow, or whatever the circumstance might be 
+		Do this by making the speed value be completely directional -> upSpeed, downSpeed, leftSpeed, rightSpeed. Defualt these values are .2. The move functions will now be dependent on these values. If there's a tailwind, then the upSpeed can become .1, while the downSpeed can become .3. A neat idea to get the game going a bit more - Thursday
+
+	make 3rd map, and make first and second map look better - Friday
+
+	Clean up Code! - Saturday and Sunday
 
 */
 

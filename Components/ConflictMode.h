@@ -19,7 +19,9 @@ public:
 	void removeAndShuffle(sf::Time& elapsed_time);
 	bool detectExitClick(exitButton button);
 	void removeSpawner(int spawnerIndex);
-	void placePowerUp(sf::RenderWindow& window);
+	void spawnAnimal();
+	void checkForVictory(sf::RenderWindow& window);
+	void resetGame();
 	void playGame();
 private:
 	exitButton button;

@@ -220,7 +220,7 @@ bool Person::generateDisease()
 {
 	//only generate disease if they're not already diseased 
 	if (!isDiseased) {
-		int random = 1 + (rand() % 5000);
+		int random = 1 + (rand() % 10000);
 		if (random == 2) {
 			isDiseased = true;
 			setDiseaseEffects();

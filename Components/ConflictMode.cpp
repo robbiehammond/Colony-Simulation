@@ -7,40 +7,42 @@
 global event possibilities
 -whenever a spawner is removed - finished
 -whenever all members of a colony die - fininshed 
--whenever a powerup is placed on the board
+-whenever a powerup is placed on the board - yep fuck that 
 */
 using namespace std;
 
-Colony _redCol(sf::Color::Red);
+//colonies and a bool values for displayed messages 
+Colony _redCol(sf::Color::Red); //index 1
 bool redColAlive = true;
 bool redDeathMessageDisplayed = false;
 
-Colony _greenCol(sf::Color::Green);
+Colony _greenCol(sf::Color::Green); //index 2
 bool greenColAlive = true;
 bool greenDeathMessageDisplayed = false;
 
-Colony _blueCol(sf::Color::Blue);
+Colony _blueCol(sf::Color::Blue); //index 3
 bool blueColAlive = true;
 bool blueDeathMessageDisplayed = false;
 
-Colony _yellowColony(sf::Color::Yellow);
+Colony _yellowColony(sf::Color::Yellow); //index 4
 bool yellowColAlive = true;
 bool yellowDeathMessageDisplayed = false;
+
+bool aliveCols[] = { 1, 1, 1, 1 }; //everyone starts out alive 
+
+//make hashmap to store indexes of colonies and the colonies 
 
 //animals
 Colony _otherCol(sf::Color::White);
 
-//set to true once all spanwers are placed 
-bool allPlaced = false;
+bool allPlaced = false; //victory achieved 
 
-vector<string> assignableNames; //currently 1188 size, can be increased. Seems like it is still running fast enough for me, and it happens before the game starts, so I don't think I need to worry too much about runtime.
+vector<string> assignableNames; //currently 1188 size, can be increased.
 
-//keep all the spawners here - 
-vector<sf::RectangleShape> spawners;
+vector<sf::RectangleShape> spawners; //keep all the spawners here
 
-//powerup to be placed 
-sf::RectangleShape powerUp(sf::Vector2f(25,25));
-bool powerUpPlaced = false;
+bool gameOver = false;
+
 
 ConflictMode::ConflictMode(sf::RenderWindow& _window, sf::Font& _font, Map _map)
 	: window(_window), font(_font), map(_map), bar(_window, _font), button(_window, _font)
@@ -113,7 +115,7 @@ Person ConflictMode::findClose(Person& prim)
 		if (curNodeDist < curMinDist && curNodeDist != 0 && prim.myCol.color != ar[i].myCol.color) {
 			//if they're the same color, possibly spread disease
 			if (prim.myCol.color == ar[i].myCol.color) {
-				int random = 1 + (rand() % 25);
+				int random = 1 + (rand() % 20);
 				if (random == 1) {
 					if (prim.spreadDisease(ar[i])) {
 						updateStatusBar(bar, prim.name + " spread disease to " + ar[i].name);
@@ -167,6 +169,7 @@ bool ConflictMode::ourSpawnerClose(Person& prim)
 //this works, but it's kinda ugly
 void ConflictMode::checkIfColonyIsAlive()
 {
+	//death messages are still true for some reason
 	bool redSpawnerFound = false;
 	bool greenSpawnerFound = false;
 	bool blueSpawnerFound = false;
@@ -181,21 +184,26 @@ void ConflictMode::checkIfColonyIsAlive()
 		else if (spawners[i].getFillColor() == sf::Color::Yellow)
 			yellowSpawnerFound = true;
 	}
+
 	if (!redSpawnerFound && !redColAlive && !redDeathMessageDisplayed) {
 		updateStatusBar(bar, "Red Colony is Eliminated!");
 		redDeathMessageDisplayed = true;
+		aliveCols[0] = 0;
 	}
 	else if (!greenSpawnerFound && !greenColAlive && !greenDeathMessageDisplayed) {
 		updateStatusBar(bar, "Green Colony is Eliminated!");
 		greenDeathMessageDisplayed = true;
+		aliveCols[1] = 0;
 	}
 	else if (!blueSpawnerFound && !blueColAlive && !blueDeathMessageDisplayed) {
 		updateStatusBar(bar, "Blue Colony is Eliminated!");
 		blueDeathMessageDisplayed = true;
+		aliveCols[2] = 0;
 	}
 	else if (!yellowSpawnerFound && !yellowColAlive && !yellowDeathMessageDisplayed) {
 		updateStatusBar(bar, "Yellow Colony is Eliminated!");
 		yellowDeathMessageDisplayed = true;
+		aliveCols[3] = 0;
 	}
 }
 
@@ -230,8 +238,6 @@ void ConflictMode::moveNode(Person& prim, Person& closest)
 	bool found = false; //if a node has been found or not 
 	float dist = prim.distance(closest);
 
-	//TODO - found seems to be a possible problem, bc lots of people are just moving to center when there's really no good reason to do so just yet. Going to the center should only really happen when there is truly no one else on the board.
-
 	//if the closest node isn't this node, isn't extremely far away, and it has a different color, move towards it
 	if (dist != 0 && dist < 1000 && prim.myCol.color != closest.myCol.color) {
 		found = true;
@@ -256,8 +262,9 @@ void ConflictMode::fillAr(int x, int y, Colony col)
 {
 	Person p(x, y, col, map.m);
 	if (p.myCol.color == sf::Color::White) {
-		p.damage = 20;
-		p.updateHealth(40);
+		p.damage = 10;
+		p.updateHealth(60);
+		p.speed = .5; //these animals are much faster than people too
 	}
 	//make sure they're being filled in a correct map range
 	if (p.checkBounds(p.position.x, p.position.y)) {
@@ -287,41 +294,42 @@ void ConflictMode::spawn()
 
 void ConflictMode::findSpawner(Person& prim)
 {
-	int closest = 5;
-	float dist = 10000;
-	for (unsigned i = 0; i < spawners.size(); i++) {
-		//update, find the shape with the closest distance 
-		float dx = spawners[i].getPosition().x - prim.position.x;
-		float dy = spawners[i].getPosition().y - prim.position.y;
-		float curDist = sqrt(dx * dx + dy * dy);
-		if (curDist < dist && spawners[i].getFillColor() != prim.myCol.color) {
-			dist = curDist;
-			closest = i;
-		}
-	}
-	if (closest < 5) {
-		sf::Vector2f curScale = spawners[closest].getSize();
-		float dx = spawners[closest].getPosition().x - prim.position.x;
-		float dy = spawners[closest].getPosition().y - prim.position.y;
-		int i = 0;
-		while (i < 2) {
-			if (dx > 0)
-				prim.moveRight();
-			if (dx < 0)
-				prim.moveLeft();
-			if (dy > 0)
-				prim.moveDown();
-			if (dy < 0)
-				prim.moveUp();
-			if (prim.shape.getGlobalBounds().intersects(spawners[closest].getGlobalBounds()) && spawners[closest].getFillColor() != prim.myCol.color) {
-				//make this a bit more complex than simply removing 5 each time it is hit. Maybe make it based on the person's strength/health?
-				curScale.x = curScale.x - 5;
-				curScale.y = curScale.y - 5;
-				spawners[closest].setSize(curScale);
+
+		int closest = 5;
+		float dist = 10000;
+		for (unsigned i = 0; i < spawners.size(); i++) {
+			//update, find the shape with the closest distance 
+			float dx = spawners[i].getPosition().x - prim.position.x;
+			float dy = spawners[i].getPosition().y - prim.position.y;
+			float curDist = sqrt(dx * dx + dy * dy);
+			if (curDist < dist && spawners[i].getFillColor() != prim.myCol.color) {
+				dist = curDist;
+				closest = i;
 			}
-			i++;
 		}
-	}
+		if (closest < 5) {
+			sf::Vector2f curScale = spawners[closest].getSize();
+			float dx = spawners[closest].getPosition().x - prim.position.x;
+			float dy = spawners[closest].getPosition().y - prim.position.y;
+			int i = 0;
+			while (i < 2) {
+				if (dx > 0)
+					prim.moveRight();
+				if (dx < 0)
+					prim.moveLeft();
+				if (dy > 0)
+					prim.moveDown();
+				if (dy < 0)
+					prim.moveUp();
+				if (prim.shape.getGlobalBounds().intersects(spawners[closest].getGlobalBounds()) && spawners[closest].getFillColor() != prim.myCol.color) {
+					//make this a bit more complex than simply removing 5 each time it is hit. Maybe make it based on the person's strength/health?
+					curScale.x = curScale.x - 5;
+					curScale.y = curScale.y - 5;
+					spawners[closest].setSize(curScale);
+				}
+				i++;
+			}
+		}
 
 }
 
@@ -349,12 +357,13 @@ void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 					findSpawner(i);
 				}
 				else {
-					Person p = findClose(i); //a pointer would work better so I don't need to make a new object, but there's some bug with the SFML source code with the getPointCount function. Not too much I can do about that, but this seems to avoid the probelm 
+					Person* p = &findClose(i); //a pointer would work better so I don't need to make a new object, but there's some bug with the SFML source code with the getPointCount function. Not too much I can do about that, but this seems to avoid the probelm 
 					if (i.generateDisease())
 						updateStatusBar(bar, i.name + " from " + i.myCol.to_string() + " Colony generated a disease!");
 					mutate(i);	
-					moveNode(i, p); 
+					moveNode(i, *p); 
 					findSpawner(i);
+					spawnAnimal();
 				}
 			}
 			move(i);
@@ -365,6 +374,11 @@ void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 		blueColAlive = blueCurAlive;
 		yellowColAlive = yellowCurAlive;
 		checkIfColonyIsAlive();
+
+		//no need to do it crazy often, so just do it once every 1000 milliseconds
+		if (elapsed_time.asMilliseconds() % 1000 == 0) {
+			checkForVictory(window);
+		}
 	}
 }
 
@@ -416,37 +430,63 @@ void ConflictMode::removeSpawner(int spawnerIndex)
 	spawners.erase(spawners.begin() + spawnerIndex);
 }
 
-//TODO - finish putting the powerup on the screen
-void ConflictMode::placePowerUp(sf::RenderWindow& window)
+void ConflictMode::spawnAnimal()
 {
-	if (!powerUpPlaced) {
-		//keep doing this until we get valid coordinates
-		int random = 1 + (rand() % 100);
-		int Xplace = 1 + (rand() % 1250); //leaving a bit of room 
-		int Yplace = 1 + (rand() % 690);
-
-		Person placehold(Xplace, Yplace, _otherCol, map); //maybe move this out of the person class
-		if (random == 5 && placehold.checkBounds(Xplace, Yplace)) {
-			int random2 = 1 + (rand() % 2); //randomly chooses the powerup
-			switch (random2) {
-			case 1:
-				//more speed
-				powerUp.setPosition(sf::Vector2f(Xplace, Yplace));
-				powerUp.setFillColor(sf::Color::Magenta);
-				break;
-			case 2:
-				//more strength
-				powerUp.setPosition(sf::Vector2f(Xplace, Yplace));
-				powerUp.setFillColor(sf::Color::Cyan);
-				break;
-				//same as before
-
-			}
-			powerUpPlaced = true;
-		}
+	int random = 1 + (rand() % 1000); //100000
+	int random2 = 1 + (rand() % 1000);
+	if (random == 1 && random2 == 1) {
+		int randomX = 1 + (rand() % 1280); //maybe lower these ranges slightly later 
+		int randomY = 1 + (rand() % 720);
+		fillAr(randomX, randomY, _otherCol);
+		updateStatusBar(bar, "An Vicious Animal Has Spawned!");
 	}
-	window.draw(powerUp);
 }
+
+//not working upon the second iteration of playing the game - seems like numAlive isn't going to 1 for whatever reason 
+void ConflictMode::checkForVictory(sf::RenderWindow& window)
+{
+	int aliveIndex = 0;
+	int numAlive = 0;
+	for (int i = 0; i < sizeof(aliveCols) / sizeof(aliveCols[0]); i++) {
+		if (aliveCols[i] == 1) {
+			numAlive++;
+			aliveIndex = i;
+		}
+		//no need to check the rest if more than 1 is alive 
+		//if (numAlive > 1)
+			//break;
+	}
+	if (numAlive == 1) {
+		gameOver = true;
+	}
+	//cout << numAlive << endl;
+
+}
+
+void ConflictMode::resetGame()
+{
+	ar.clear();
+	spawners.clear();
+	allPlaced = false;
+	gameOver = false;
+	for (int i = 0; i < 4; i++) {
+		aliveCols[i] = 1;
+	}
+
+	redColAlive = true;
+	redDeathMessageDisplayed = false;
+
+	greenColAlive = true;
+	greenDeathMessageDisplayed = false;
+
+	blueColAlive = true;
+	blueDeathMessageDisplayed = false;
+
+	yellowColAlive = true;
+	yellowDeathMessageDisplayed = false;
+}
+
+
 
 
 
@@ -459,8 +499,7 @@ void ConflictMode::playGame()
 	maptext.loadFromFile(map.to_string());
 	sf::Sprite map(maptext);
 
-	while (window.isOpen() && !detectExitClick(button)) {
-
+	while (window.isOpen() && !detectExitClick(button) && !gameOver) {
 
 		elapsed_time += r.restart();
 		sf::Event event;
@@ -478,23 +517,37 @@ void ConflictMode::playGame()
 		drawStatusBar(bar);
 		drawExitButton(button);
 
-		if (event.type == event.MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left && !allPlaced) {
+		if (event.type == event.MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left && !allPlaced)
 			setSpawnPoints();
-		}
 		if (spawners.size() == 4)
 			allPlaced = true;
 
 		updateSpawners(window);
 		updateNodes(window, elapsed_time);
-		placePowerUp(window);
 
 		window.display();
 
 		//remove and shuffle
 		removeAndShuffle(elapsed_time);
 	}
+
+	//if we break out of this loop bc the game is over, display which colony has won. If the game isn't over and we exit (window closed or the exit button was pressed), this code won't be executed
+	if (gameOver) {
+		elapsed_time = r.restart();
+		sf::Text text;
+		text.setFont(font);
+		text.setString("This is a test"); //now we just need to find out which colony has won and then we're golden!
+		text.setPosition(600, 300);
+		text.setCharacterSize(30);
+		text.setFillColor(sf::Color::White);
+		while (elapsed_time.asSeconds() < 5) {
+			elapsed_time += r.restart();
+			window.clear();
+			window.draw(text);
+			window.display();
+		}
+	}
+
 	//clear this game so the next game can start properly
-	ar.clear();
-	spawners.clear();
-	allPlaced = false;
+	resetGame();
 }
