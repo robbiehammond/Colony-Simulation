@@ -10,6 +10,10 @@
 
 /*
 specific plans:
+
+	make it so the game can end when there's no colonies alive
+
+
 	Weekend Over and some good progress was made- here's what we still need to do 
 
 	balance the mutations and diseases, so that the game is a bit more fair and things seem more random (ie it is actually entertaining to watch) (powerUps removed bc it caused too many bugs and it broke the "flow" of the gameplay) - Wednesday

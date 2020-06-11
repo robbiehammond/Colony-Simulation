@@ -5,7 +5,8 @@ public:
 	ConflictMode(sf::RenderWindow& _window, sf::Font& _font, Map _map);
 	void fillNameArray();
 	void setSpawnPoints();
-	Person findClose(Person& prim);
+	Person& findClose(Person& prim);
+	void mutate(Person& person);
 	bool otherSpawnerClose(Person& prim);
 	bool ourSpawnerClose(Person& prim);
 	void checkIfColonyIsAlive();

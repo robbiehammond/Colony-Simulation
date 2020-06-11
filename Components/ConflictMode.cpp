@@ -100,7 +100,7 @@ void ConflictMode::setSpawnPoints()
 		//rect.setFillColor(curCol.color);
 }
 
-Person ConflictMode::findClose(Person& prim)
+Person& ConflictMode::findClose(Person& prim)
 {
 	Person placeholder(-10000, -100000, prim.myCol, prim.curMap);
 
@@ -110,18 +110,20 @@ Person ConflictMode::findClose(Person& prim)
 	Person* saveNode = &prim;
 
 	for (auto i = 0; i < ar.size(); i++) {
+
 		const float curNodeDist = prim.distance(ar[i]);
-		//if this node is close enough to be found and this node isn't itself, continue
-		if (curNodeDist < curMinDist && curNodeDist != 0 && prim.myCol.color != ar[i].myCol.color) {
-			//if they're the same color, possibly spread disease
-			if (prim.myCol.color == ar[i].myCol.color) {
-				int random = 1 + (rand() % 20);
-				if (random == 1) {
-					if (prim.spreadDisease(ar[i])) {
-						updateStatusBar(bar, prim.name + " spread disease to " + ar[i].name);
-					}
+
+		//if they're the same color, possibly spread disease
+		if (prim.myCol.color == ar[i].myCol.color) {
+			int random = 1 + (rand() % 190);
+			if (random == 1) {
+				if (prim.spreadDisease(ar[i])) {
+					updateStatusBar(bar, prim.name + " spread disease to " + ar[i].name);
 				}
 			}
+		}
+		//if this node is close enough to be found and this node isn't itself, continue
+		if (curNodeDist < curMinDist && curNodeDist != 0 && prim.myCol.color != ar[i].myCol.color) {
 			//the close node is now an actual close node, and not just the searching node
 			saveNode = &ar[i];
 			break;
@@ -134,6 +136,25 @@ Person ConflictMode::findClose(Person& prim)
 	else
 		return *saveNode;
 }
+
+void ConflictMode::mutate(Person& person)
+{
+	int random = 1 + (rand() % 1000);
+	//mutation 1: get healthier
+	if (random == 500)
+	{
+		person.updateHealth(person.radius + 1);
+	}
+	//mutation 2: get stronger
+	if (random == 501) {
+		person.damage += 1;
+	}
+	if (random % 100) { //a liitle bit more common
+		person.sufferDiseaseEffects();
+	}
+}
+
+
 
 
 //if a spawner is close (maybe within 50?), ignore all other nodes and go to spawner 
@@ -353,13 +374,19 @@ void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 				yellowCurAlive = true;
 
 			if (elapsed_time.asMilliseconds() % 100 == 0) {
+				//if another spawner is very close, go directly to it and do nothing else 
 				if (otherSpawnerClose(i)) {
 					findSpawner(i);
 				}
 				else {
-					Person* p = &findClose(i); //a pointer would work better so I don't need to make a new object, but there's some bug with the SFML source code with the getPointCount function. Not too much I can do about that, but this seems to avoid the probelm 
+					Person* p = &findClose(i); 
+					//random chance to generate a disease
 					if (i.generateDisease())
 						updateStatusBar(bar, i.name + " from " + i.myCol.to_string() + " Colony generated a disease!");
+					//random chance to recover from disease (if they are diseased) 
+					else if (i.recoverFromDisease())
+						updateStatusBar(bar, i.name + " from " + i.myCol.to_string() + " Colony has recovered!");
+					//chance for mutation, then move to close node and close spawner, chance to spawn animal  
 					mutate(i);	
 					moveNode(i, *p); 
 					findSpawner(i);
@@ -453,14 +480,12 @@ void ConflictMode::checkForVictory(sf::RenderWindow& window)
 			aliveIndex = i;
 		}
 		//no need to check the rest if more than 1 is alive 
-		//if (numAlive > 1)
-			//break;
+		if (numAlive > 1)
+			break;
 	}
 	if (numAlive == 1) {
 		gameOver = true;
 	}
-	//cout << numAlive << endl;
-
 }
 
 void ConflictMode::resetGame()
@@ -547,7 +572,6 @@ void ConflictMode::playGame()
 			window.display();
 		}
 	}
-
 	//clear this game so the next game can start properly
 	resetGame();
 }

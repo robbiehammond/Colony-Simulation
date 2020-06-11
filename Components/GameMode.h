@@ -32,9 +32,10 @@ public:
 	string sfColorToString(sf::Color color);
 	vector<Person> ar;
 	void move(Person& p);
-	virtual Person findClose(Person& prim) = 0;
+	//TODO - make findClose to be virtual Person& findClose(Person& prim) and then use the same code from conflict mode. This really shouldn't affect SandboxMode much besides having to make certain things a pointer, but nothing else should be different
+	virtual Person& findClose(Person& prim) = 0;
 	bool findHardClose(Person& prim);
-	void mutate(Person& person);
+	virtual void mutate(Person& person) = 0;
 	void drawStatusBar(StatusBar& s);
 	void updateStatusBar(StatusBar& bar, string s);
 	void drawExitButton(exitButton& button);

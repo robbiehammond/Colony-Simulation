@@ -12,7 +12,8 @@ SandboxMode::SandboxMode(sf::RenderWindow& _window, sf::Font& _font, Map _map)
 	playGame();
 }
 
-Person SandboxMode::findClose(Person& prim)
+//make this return a person&
+Person& SandboxMode::findClose(Person& prim)
 {
 	Person placeholder(-10000, -100000, prim.myCol, prim.curMap);
 
@@ -32,6 +33,20 @@ Person SandboxMode::findClose(Person& prim)
 	}
 	else
 		return *saveNode;
+}
+
+void SandboxMode::mutate(Person& person)
+{
+	int random = 1 + (rand() % 1000);
+	//mutation 1: get healthier
+	if (random == 500)
+	{
+		person.updateHealth(person.radius + 1);
+	}
+	//mutation 2: get stronger
+	if (random == 501) {
+		person.damage += 1;
+	}
 }
 
 void SandboxMode::fillAr(int x, int y, Colony col)
@@ -93,9 +108,10 @@ void SandboxMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 		for (auto& i : ar)
 		{
 			if (elapsed_time.asMilliseconds() % 100 == 0) {
-				Person p = findClose(i);
+				//you'll soon be a pointer to the reference of findNode
+				Person* p = &findClose(i);
 				mutate(i);
-				moveNode(i, p);
+				moveNode(i, *p);
 			}
 			move(i);
 			window.draw(i.shape);

@@ -31,12 +31,15 @@ public:
 	void moveLeft();
 
 	void moveToCenter();
-	void updateRadius(float radius);
-	void updateHealth(float health);
+	void updateRadius(float _radius);
+	void updateHealth(float _health);
+	void updateSpeed(float _speed);
 	bool checkBounds(float x, float y);
 	bool generateDisease(); //bool to return if the person actually got the disease or not 
 	void setDiseaseEffects();
 	bool spreadDisease(Person& other);
+	bool recoverFromDisease();
+	void sufferDiseaseEffects();
 	void assignName(string assignedName);
 
 private:

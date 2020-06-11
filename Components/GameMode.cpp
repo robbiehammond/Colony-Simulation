@@ -72,22 +72,6 @@ bool GameMode::findHardClose(Person& prim)
 	return true;
 }
 
-
-void GameMode::mutate(Person& person)
-{
-	int random = 1 + (rand() % 1000);
-	//mutation 1: get healthier
-	if (random == 500)
-	{
-		person.updateHealth(person.radius + 1);
-	}
-	//mutation 2: get stronger
-	if (random == 501) {
-		person.damage += 1;
-	}
-	//make logic to possibly remove the disease through mutation
-}
-
 //this could go in person class, but I'll leave that for if I feel like doing it later 
 void GameMode::moveTowardNode(Person& prim, Person& closest)
 {

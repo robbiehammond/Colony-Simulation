@@ -3,7 +3,8 @@
 class SandboxMode : public GameMode {
 public:
 	SandboxMode(sf::RenderWindow& _window, sf::Font& _font, Map _map);
-	Person findClose(Person& prim);
+	Person& findClose(Person& prim);
+	void mutate(Person& person);
 	void getUserInput(sf::RenderWindow& window, sf::Event& event);
 	void fillAr(int x, int y, Colony col);
 	void randomSpawn();

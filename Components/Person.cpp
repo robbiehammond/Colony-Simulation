@@ -183,6 +183,11 @@ void Person::updateHealth(float _health)
 	updateRadius(health);
 }
 
+void Person::updateSpeed(float _speed)
+{
+	speed = _speed;
+}
+
 //returns if the bounds are valid 
 bool Person::checkBounds(float x, float y)
 {
@@ -220,8 +225,8 @@ bool Person::generateDisease()
 {
 	//only generate disease if they're not already diseased 
 	if (!isDiseased) {
-		int random = 1 + (rand() % 10000);
-		if (random == 2) {
+		int random = 1 + (rand() % 100000); //100000
+		if (random == 1) {
 			isDiseased = true;
 			setDiseaseEffects();
 			return true;
@@ -232,24 +237,68 @@ bool Person::generateDisease()
 
 void Person::setDiseaseEffects()
 { 
-		shape.setOutlineColor(sf::Color::White);
-		cout << this << endl;
-		shape.setOutlineThickness(2);//maybe make larger 
-
+	if (myCol.color == sf::Color::Red) {
+		sf::Color diseasedRed(100, 0, 0, 255);
+		shape.setFillColor(diseasedRed);
+	}
+	else if (myCol.color == sf::Color::Blue) {
+		sf::Color diseasedBlue(0, 0, 100, 255);
+		shape.setFillColor(diseasedBlue);
+	}
+	else if (myCol.color == sf::Color::Green) {
+		sf::Color diseasedGreen(0, 100, 0, 255);
+		shape.setFillColor(diseasedGreen);
+	}
+	else if (myCol.color == sf::Color::Yellow) {
+		sf::Color diseasedYellow(250, 240, 180, 255);
+		shape.setFillColor(diseasedYellow);
+	}
 }
 
 //who we spread disease to is found through ConflictMode file
-//Also, maybe not make this void, and whenever disease is spread, put on the status bar "(this node) just spread disease to (this other node)"
 //returns if the disease was successfully spread
 bool Person::spreadDisease(Person& other)
 {
+	//if we are diseased and the other person is not diseased 
 	if (isDiseased && !other.isDiseased) {
 		other.isDiseased = true;
 		other.setDiseaseEffects();
-		cout << "disease was spread" << endl;//doesn't work yet, not sure why
 		return true;
 	}
 	return false;
+}
+
+bool Person::recoverFromDisease()
+{
+	int random = 1 + (rand() % 1000);
+	if (isDiseased && random == 1) {
+		isDiseased = false;
+		if (myCol.color == sf::Color::Red)
+			shape.setFillColor(sf::Color::Red);
+
+		else if (myCol.color == sf::Color::Blue)
+			shape.setFillColor(sf::Color::Blue);
+
+		else if (myCol.color == sf::Color::Green)
+			shape.setFillColor(sf::Color::Green);
+
+		else if (myCol.color == sf::Color::Yellow)
+			shape.setFillColor(sf::Color::Yellow);
+		return true;
+	}
+	return false;
+}
+
+void Person::sufferDiseaseEffects()
+{
+	if (isDiseased) {
+		cout << "here" << endl;
+		int random = 1 + (rand() % 2);
+		if (random == 1)
+			updateHealth(health - 1);
+		if (random == 2)
+			updateSpeed(speed - .02);
+	}
 }
 
 void Person::assignName(string assignedName)
