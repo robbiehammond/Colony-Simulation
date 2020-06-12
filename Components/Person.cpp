@@ -23,6 +23,11 @@ Person::Person(float startX, float startY, Colony _col, Map _curMap)
 
 	name = ""; //to be initialized in conflict mode and left blank in sandbox mode
 
+	upSpeed = 0.2f;
+	downSpeed = 0.2f;
+	leftSpeed = 0.2f;
+	rightSpeed = 0.2f;
+
 }
 
 
@@ -31,57 +36,56 @@ Person::Person(float startX, float startY, Colony _col, Map _curMap)
 void Person::moveUp()
 {
 	float temp = position.y;
-	temp -= speed;
+	temp -= defaultSpeed; //flip this to the correct stuff 
 	//check if where they're trying to move is a valid position
 	if (checkBounds(position.x, temp))
 	{
-		position.y -= speed;
+		position.y -= upSpeed;
 		shape.setPosition(position);
 	}
-	//if it's not, push them backwards and nudge them toward the center
+	//if it's not, push them in perpendicular direction first 
 	if (!checkBounds(position.x, temp))
 	{
 		if (position.x < 640) {
-			position.x += speed;
+			position.x += rightSpeed;
 			shape.setPosition(position);
 		}
 		else
 		{
-			position.x -= speed;
+			position.x -= leftSpeed;
 			shape.setPosition(position);
 		}
 	}
-	//so they don't get stuck, move them in a perpendicular direction as well
+	//keep pushing them back in the opposite direction until their position is valid 
 	while (!checkBounds(position.x, position.y)) {
-		position.y += speed;
+		position.y += downSpeed;
 		shape.setPosition(position);
-		
 	}
 }
 
 void Person::moveDown()
 {
 	float temp = position.y;
-	temp += speed;
+	temp += defaultSpeed;
 	if (checkBounds(position.x, temp)) {
-		position.y += speed;
+		position.y += downSpeed;
 		shape.setPosition(position);
 	}
 	if (!checkBounds(position.x, temp))
 	{
 		if (position.x < 640) {
-			position.x += speed;
+			position.x += rightSpeed;
 			shape.setPosition(position);
 		}
 		else
 		{
-			position.x -= speed;
+			position.x -= leftSpeed;
 			shape.setPosition(position);
 		}
 	}
 	
 	while (!checkBounds(position.x, position.y)) {
-		position.y -= speed;
+		position.y -= upSpeed;
 		shape.setPosition(position);
 		
 	}
@@ -90,26 +94,26 @@ void Person::moveDown()
 void Person::moveLeft()
 {
 	float temp = position.x;
-	temp -= speed;
+	temp -= defaultSpeed;
 	if (checkBounds(temp, position.y)) {
-		position.x -= speed;
+		position.x -= leftSpeed;
 		shape.setPosition(position);
 	}
 	if (!checkBounds(temp, position.y))
 	{
 		if (position.y < 360) {
-			position.y += speed;
+			position.y += downSpeed;
 			shape.setPosition(position);
 		}
 		else
 		{
-			position.y -= speed;
+			position.y -= upSpeed;
 			shape.setPosition(position);
 		}
 	}
 	
 	while (!checkBounds(position.x, position.y)) {
-		position.x += speed;
+		position.x += rightSpeed;
 		shape.setPosition(position);
 		
 	}
@@ -120,26 +124,26 @@ void Person::moveRight()
 {
 	
 	float temp = position.x;
-	temp += speed;
+	temp += defaultSpeed;
 	if (checkBounds(temp, position.y)) {
-		position.x += speed;
+		position.x += rightSpeed;
 		shape.setPosition(position);
 	}
 	if (!checkBounds(temp,position.y))
 	{
 		if (position.y < 360) {
-			position.y += speed;
+			position.y += downSpeed;
 			shape.setPosition(position);
 		}
 		else
 		{
-			position.y -= speed;
+			position.y -= upSpeed;
 			shape.setPosition(position);
 		}
 	}
 		
 	while (!checkBounds(position.x, position.y)) {
-		position.x -= speed;
+		position.x -= leftSpeed;
 		shape.setPosition(position);
 		
 	}
@@ -185,7 +189,7 @@ void Person::updateHealth(float _health)
 
 void Person::updateSpeed(float _speed)
 {
-	speed = _speed;
+	defaultSpeed = _speed;
 }
 
 //returns if the bounds are valid 
@@ -292,16 +296,24 @@ bool Person::recoverFromDisease()
 void Person::sufferDiseaseEffects()
 {
 	if (isDiseased) {
-		cout << "here" << endl;
 		int random = 1 + (rand() % 2);
 		if (random == 1)
-			updateHealth(health - 1);
+			updateHealth(health - .05);
 		if (random == 2)
-			updateSpeed(speed - .02);
+			updateSpeed(defaultSpeed - .01);
 	}
 }
 
 void Person::assignName(string assignedName)
 {
 	name = assignedName;
+}
+
+void Person::resetSpeed()
+{
+	upSpeed = defaultSpeed;
+	downSpeed = defaultSpeed;
+	leftSpeed = defaultSpeed;
+	rightSpeed = defaultSpeed;
+	weatherEffectsSet = false;
 }

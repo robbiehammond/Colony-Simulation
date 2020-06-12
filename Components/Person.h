@@ -20,9 +20,15 @@ public:
 	bool isDiseased;
 	float radius;
 	int health;
-	float speed = 0.2f;
+	float defaultSpeed = 0.2f;
 	int damage;
 	Map curMap;
+
+	float upSpeed;
+	float downSpeed;
+	float rightSpeed;
+	float leftSpeed;
+	bool weatherEffectsSet = false;
 
 	float distance(Person& other);
 	void moveUp();
@@ -41,6 +47,7 @@ public:
 	bool recoverFromDisease();
 	void sufferDiseaseEffects();
 	void assignName(string assignedName);
+	void resetSpeed();
 
 private:
 	//TODO - make a list of names that ISN'T recreated each and every time a new person is made. Miss with that

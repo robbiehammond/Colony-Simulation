@@ -11,8 +11,6 @@
 /*
 specific plans:
 
-	make it so the game can end when there's no colonies alive
-
 
 	Weekend Over and some good progress was made- here's what we still need to do 
 

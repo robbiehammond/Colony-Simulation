@@ -1,5 +1,14 @@
 #pragma once
 #include "GameMode.h"
+
+enum Weather {
+	Updraft,
+	Downdraft,
+	Leftdraft,
+	Rightdraft,
+	NoWeather
+};
+
 class ConflictMode : public GameMode {
 public:
 	ConflictMode(sf::RenderWindow& _window, sf::Font& _font, Map _map);
@@ -21,8 +30,12 @@ public:
 	bool detectExitClick(exitButton button);
 	void removeSpawner(int spawnerIndex);
 	void spawnAnimal();
+	void decideWeatherEffects();
+	void setWeatherEffects();
+	void resetWeatherEffects();
 	void checkForVictory(sf::RenderWindow& window);
 	void resetGame();
+	string declareWinner();
 	void playGame();
 private:
 	exitButton button;

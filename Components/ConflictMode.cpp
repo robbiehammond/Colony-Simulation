@@ -43,12 +43,18 @@ vector<sf::RectangleShape> spawners; //keep all the spawners here
 
 bool gameOver = false;
 
+Weather weather;
+
+bool weatherEffectsActive = false;
+
 
 ConflictMode::ConflictMode(sf::RenderWindow& _window, sf::Font& _font, Map _map)
 	: window(_window), font(_font), map(_map), bar(_window, _font), button(_window, _font)
 {
 	fillNameArray();
 	playGame();
+	weather = NoWeather;
+
 }
 
 //fills the name array from the name file 
@@ -149,7 +155,15 @@ void ConflictMode::mutate(Person& person)
 	if (random == 501) {
 		person.damage += 1;
 	}
-	if (random % 100) { //a liitle bit more common
+	//mutation 3: get faster
+	if (random == 502) {
+		person.upSpeed += .05;
+		person.downSpeed += .05;
+		person.leftSpeed += .05;
+		person.rightSpeed += .05;
+	}
+	//mutation 4: if diseased, SUFFER
+	if (random % 100) { //modulo so it's a bit more common 
 		person.sufferDiseaseEffects();
 	}
 }
@@ -279,13 +293,14 @@ void ConflictMode::moveNode(Person& prim, Person& closest)
 		}
 }
 
+//the drafts don't affect people who were spawned after the draft was declared
 void ConflictMode::fillAr(int x, int y, Colony col)
 {
 	Person p(x, y, col, map.m);
 	if (p.myCol.color == sf::Color::White) {
 		p.damage = 10;
 		p.updateHealth(60);
-		p.speed = .5; //these animals are much faster than people too
+		p.defaultSpeed = .5; //these animals are much faster than people too
 	}
 	//make sure they're being filled in a correct map range
 	if (p.checkBounds(p.position.x, p.position.y)) {
@@ -405,6 +420,10 @@ void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 		//no need to do it crazy often, so just do it once every 1000 milliseconds
 		if (elapsed_time.asMilliseconds() % 1000 == 0) {
 			checkForVictory(window);
+			decideWeatherEffects(); 
+		}
+		if (elapsed_time.asMilliseconds() % 20000 == 0 && weatherEffectsActive) { //every 20 seconds, weather should be reset
+			resetWeatherEffects();
 		}
 	}
 }
@@ -469,15 +488,101 @@ void ConflictMode::spawnAnimal()
 	}
 }
 
+void ConflictMode::decideWeatherEffects()
+{
+	if (!weatherEffectsActive) {
+		int random = 1 + (rand() % 100);
+		switch (random) {
+		case 1:
+			weather = Updraft;
+			break;
+		case 2:
+			weather = Downdraft;
+			break;
+		case 3:
+			weather = Leftdraft;
+			break;
+		case 4:
+			weather = Rightdraft;
+			break;
+		default:
+			weather = NoWeather;
+			break;
+		}
+		setWeatherEffects();
+	}
+}
+
+void ConflictMode::setWeatherEffects()
+{
+	switch (weather) {
+	case Updraft:
+		for (int i = 0; i < ar.size(); i++) {
+			if (!ar[i].weatherEffectsSet) {// if this hasn't already been applied
+				ar[i].upSpeed += .01f;
+				ar[i].weatherEffectsSet = true;
+			}
+		}
+		weatherEffectsActive = true;
+		updateStatusBar(bar, "An upwards breeze hit the nodes!");
+		break;
+	case Downdraft:
+		for (int i = 0; i < ar.size(); i++) {
+			if (!ar[i].weatherEffectsSet) {
+				ar[i].downSpeed += .01f;
+				ar[i].weatherEffectsSet = true;
+			}
+		}
+		weatherEffectsActive = true;
+		updateStatusBar(bar, "A downwards breeze has hit the nodes!");
+		break;
+	case Leftdraft:
+		for (int i = 0; i < ar.size(); i++) {
+			if (!ar[i].weatherEffectsSet) {
+				ar[i].leftSpeed += .01f;
+				ar[i].weatherEffectsSet = true;
+			}
+		}
+		weatherEffectsActive = true;
+		updateStatusBar(bar, "A leftwards breeze has hit the nodes!");
+		break;
+	case Rightdraft:
+		for (int i = 0; i < ar.size(); i++) {
+			if (!ar[i].weatherEffectsSet) {
+				ar[i].rightSpeed += .01f;
+				ar[i].weatherEffectsSet = true;
+			}
+		}
+		weatherEffectsActive = true;
+		updateStatusBar(bar, "A rightwards breeze has hit the nodes!");
+		break;
+	case NoWeather:
+		break;
+	default: //just in case I add anything else later on 
+		break;
+	}
+}
+
+void ConflictMode::resetWeatherEffects()
+{
+	for (int i = 0; i < ar.size(); i++) {
+		ar[i].resetSpeed();
+	}
+	weatherEffectsActive = false;
+	updateStatusBar(bar, "The breeze has subsided");
+}
+
 //not working upon the second iteration of playing the game - seems like numAlive isn't going to 1 for whatever reason 
 void ConflictMode::checkForVictory(sf::RenderWindow& window)
 {
-	int aliveIndex = 0;
+	for (int i = 0; i < 4; i++) {
+		cout << aliveCols[i] << endl;
+	}
+	cout << endl;
 	int numAlive = 0;
 	for (int i = 0; i < sizeof(aliveCols) / sizeof(aliveCols[0]); i++) {
 		if (aliveCols[i] == 1) {
 			numAlive++;
-			aliveIndex = i;
 		}
 		//no need to check the rest if more than 1 is alive 
 		if (numAlive > 1)
@@ -511,8 +616,36 @@ void ConflictMode::resetGame()
 	yellowDeathMessageDisplayed = false;
 }
 
-
-
+string ConflictMode::declareWinner()
+{
+	bool aliveColFound = false;
+	int i = 0;
+	int aliveIndex = -1; //something invalid
+	//find out which colony is alive - should be either 1 or 0, depending if the colonies all kill each other or not 
+	while (i < 4 && !aliveColFound) { //make this 4 value into a variable that just knows the number of starting colonies
+		if (aliveCols[i] == 1) {
+			aliveColFound = true;
+			aliveIndex = i;
+		}
+		i++;
+	}
+	if (aliveColFound) {
+		switch (aliveIndex) {
+		case 0:
+			return "Red Colony has Won!";
+		case 1:
+			return "Green Colony has Won!";
+		case 2:
+			return "Blue Colony has Won!";
+		case 3:
+			return "Yellow Colony has Won!";
+		defualt:
+			throw std::invalid_argument("Houston, we got a problem");
+		}
+	}
+	//if we did not go through the if statement, that means that 0s were found at all indexes, thus the colonies all killed each other and there were no survivors, so return something else
+	return "Everyone annihilated each other...\nThere is no winner.";
+}
 
 
 void ConflictMode::playGame()
@@ -544,8 +677,11 @@ void ConflictMode::playGame()
 
 		if (event.type == event.MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left && !allPlaced)
 			setSpawnPoints();
-		if (spawners.size() == 4)
+		if (spawners.size() == 4) {
+			if (!allPlaced) //so that it only displays once
+				updateStatusBar(bar, "Let the simulation begin!");
 			allPlaced = true;
+		}
 
 		updateSpawners(window);
 		updateNodes(window, elapsed_time);
@@ -561,8 +697,8 @@ void ConflictMode::playGame()
 		elapsed_time = r.restart();
 		sf::Text text;
 		text.setFont(font);
-		text.setString("This is a test"); //now we just need to find out which colony has won and then we're golden!
-		text.setPosition(600, 300);
+		text.setString(declareWinner()); 
+		text.setPosition(600, 300); //this is off center, fix this 
 		text.setCharacterSize(30);
 		text.setFillColor(sf::Color::White);
 		while (elapsed_time.asSeconds() < 5) {
