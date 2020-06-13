@@ -27,5 +27,6 @@ public:
 private:
 	min_max x_restriction;
 	min_max y_restriction;
+	void setScreenBoundaries();
 	void setRestrictions();
 };

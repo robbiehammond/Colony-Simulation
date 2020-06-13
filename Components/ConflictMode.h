@@ -15,9 +15,10 @@ public:
 	void fillNameArray();
 	void setSpawnPoints();
 	Person& findClose(Person& prim);
+	Person& findVeryClose(Person& prim);
 	void mutate(Person& person);
 	bool otherSpawnerClose(Person& prim);
-	bool ourSpawnerClose(Person& prim);
+	bool otherSpawnerSomewhatClose(Person& prim);
 	void checkIfColonyIsAlive();
 	void getUserInput(sf::RenderWindow& window, sf::Event& event);
 	void updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time);

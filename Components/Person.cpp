@@ -203,6 +203,10 @@ bool Person::checkBounds(float x, float y)
 	for (int i = 0; i < curMap.x_restrictions.size(); i++) {
 		switch (map)
 		{
+		case Map0:
+			if (x_coord >= std::get<0>(curMap.x_restrictions[i]) && x_coord <= std::get<1>(curMap.x_restrictions[i]) && y_coord >= std::get<0>(curMap.y_restrictions[i]) && y_coord <= std::get<1>(curMap.y_restrictions[i])) {
+				return false;
+			}
 		case Map1:
 			if (x_coord >= std::get<0>(curMap.x_restrictions[i]) && x_coord <= std::get<1>(curMap.x_restrictions[i]) && y_coord >= std::get<0>(curMap.y_restrictions[i]) && y_coord <= std::get<1>(curMap.y_restrictions[i])) {
 				return false;
@@ -214,6 +218,9 @@ bool Person::checkBounds(float x, float y)
 			}
 			break;
 		case Map3:
+			if (x_coord >= std::get<0>(curMap.x_restrictions[i]) && x_coord <= std::get<1>(curMap.x_restrictions[i]) && y_coord >= std::get<0>(curMap.y_restrictions[i]) && y_coord <= std::get<1>(curMap.y_restrictions[i])) {
+				return false;
+			}
 			break;
 		default:
 			return true;
@@ -229,7 +236,7 @@ bool Person::generateDisease()
 {
 	//only generate disease if they're not already diseased 
 	if (!isDiseased) {
-		int random = 1 + (rand() % 100000); //100000
+		int random = 1 + (rand() % 10000); //100000
 		if (random == 1) {
 			isDiseased = true;
 			setDiseaseEffects();
@@ -293,6 +300,7 @@ bool Person::recoverFromDisease()
 	return false;
 }
 
+//make sure you mention that disease slows people to a halt and hurts them 
 void Person::sufferDiseaseEffects()
 {
 	if (isDiseased) {
@@ -300,7 +308,7 @@ void Person::sufferDiseaseEffects()
 		if (random == 1)
 			updateHealth(health - .05);
 		if (random == 2)
-			updateSpeed(defaultSpeed - .01);
+			updateSpeed(defaultSpeed - .05);
 	}
 }
 

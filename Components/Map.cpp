@@ -14,6 +14,35 @@ Map::Map(const MapSelection _m)
 	setRestrictions();
 }
 
+//puts boundaries on the edges of the screen
+void Map::setScreenBoundaries()
+{
+	//left edge boundary
+	x_restriction = make_tuple(-3000, 0);
+	y_restriction = make_tuple(-3000, 3000);
+	x_restrictions.push_back(x_restriction);
+	y_restrictions.push_back(y_restriction);
+
+	//right edge boundary
+	x_restriction = make_tuple(1280, 3000);
+	y_restriction = make_tuple(-3000, 3000);
+	x_restrictions.push_back(x_restriction);
+	y_restrictions.push_back(y_restriction);
+
+
+	//top boundary
+	x_restriction = make_tuple(-3000, 3000);
+	y_restriction = make_tuple(720, 3000);
+	x_restrictions.push_back(x_restriction);
+	y_restrictions.push_back(y_restriction);
+
+	//bottom boundary
+	x_restriction = make_tuple(-3000, 3000);
+	y_restriction = make_tuple(-3000, 0);
+	x_restrictions.push_back(x_restriction);
+	y_restrictions.push_back(y_restriction);
+}
+
 void Map::setRestrictions()
 {
 
@@ -21,9 +50,11 @@ void Map::setRestrictions()
 	
 	switch (m) {
 	case Map0:
-		//no boundaries 
+		setScreenBoundaries();
 		break;
+
 	case Map1:
+		setScreenBoundaries();
 		//top left square
 		x_restriction = make_tuple(100, 200);
 		y_restriction = make_tuple(100, 200);
@@ -50,6 +81,7 @@ void Map::setRestrictions()
 
 		break;
 	case Map2:
+		setScreenBoundaries();
 		//top left
 		x_restriction = make_tuple(480, 580);
 		y_restriction = make_tuple(200, 300);
@@ -75,6 +107,14 @@ void Map::setRestrictions()
 		y_restrictions.push_back(y_restriction);
 		break;
 	case Map3:
+		setScreenBoundaries();
+		//top left
+		x_restriction = make_tuple(196, 296);
+		y_restriction = make_tuple(120, 220);
+		x_restrictions.push_back(x_restriction);
+		y_restrictions.push_back(y_restriction);
+
+		//make the rest 
 		break;
 	default:
 		std::cout << "We got problems" << endl;

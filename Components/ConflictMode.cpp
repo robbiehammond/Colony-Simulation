@@ -121,7 +121,7 @@ Person& ConflictMode::findClose(Person& prim)
 
 		//if they're the same color, possibly spread disease
 		if (prim.myCol.color == ar[i].myCol.color) {
-			int random = 1 + (rand() % 190);
+			int random = 1 + (rand() % 500);
 			if (random == 1) {
 				if (prim.spreadDisease(ar[i])) {
 					updateStatusBar(bar, prim.name + " spread disease to " + ar[i].name);
@@ -143,6 +143,7 @@ Person& ConflictMode::findClose(Person& prim)
 		return *saveNode;
 }
 
+
 void ConflictMode::mutate(Person& person)
 {
 	int random = 1 + (rand() % 1000);
@@ -163,13 +164,10 @@ void ConflictMode::mutate(Person& person)
 		person.rightSpeed += .05;
 	}
 	//mutation 4: if diseased, SUFFER
-	if (random % 100) { //modulo so it's a bit more common 
+	if (random % 100 == 0) { //modulo so it's a bit more common 
 		person.sufferDiseaseEffects();
 	}
 }
-
-
-
 
 //if a spawner is close (maybe within 50?), ignore all other nodes and go to spawner 
 bool ConflictMode::otherSpawnerClose(Person& prim)
@@ -178,28 +176,24 @@ bool ConflictMode::otherSpawnerClose(Person& prim)
 	int y = prim.shape.getPosition().y;
 	for (unsigned i = 0; i < spawners.size(); i++) {
 		if (abs(spawners[i].getPosition().x - x) < 100 && abs(spawners[i].getPosition().y - y) < 100 && spawners[i].getFillColor() != prim.myCol.color) {
-			//cout << "true was found";
 			return true;
 		}
 	}
 	return false;
 }
 
-//ununsed for now, but might not always be that way
-bool ConflictMode::ourSpawnerClose(Person& prim)
+bool ConflictMode::otherSpawnerSomewhatClose(Person& prim)
 {
 	int x = prim.shape.getPosition().x;
 	int y = prim.shape.getPosition().y;
 	for (unsigned i = 0; i < spawners.size(); i++) {
-		//need to be a bit closer to our own spawner in order to return true
-		//let's start with 50 and see how it goes
-		if (abs(spawners[i].getPosition().x - x) < 25 && abs(spawners[i].getPosition().y - y) < 25 && spawners[i].getFillColor() == prim.myCol.color) {
-			cout << prim.name + " from " + sfColorToString(prim.myCol.color) + " was close enough to their spawner" << endl;
+		if (abs(spawners[i].getPosition().x - x) < 2000 && abs(spawners[i].getPosition().y - y) < 2000 && spawners[i].getFillColor() != prim.myCol.color) {
 			return true;
 		}
 	}
 	return false;
 }
+
 
 //this works, but it's kinda ugly
 void ConflictMode::checkIfColonyIsAlive()
@@ -278,6 +272,10 @@ void ConflictMode::moveNode(Person& prim, Person& closest)
 		found = true;
 		moveTowardNode(prim, closest);
 	}
+	else if (spawners.size() > 0 && otherSpawnerSomewhatClose(prim)) { //if there's more spawners and they're somewhat close, and we couldn't find anyone close,  find the spawner 
+		findSpawner(prim);
+		found = true;
+	}
 	else if (spawners.size() == 1 && spawners[0].getFillColor() != prim.myCol.color) { //only spawner on board matches doesn't this person's color 
 		findSpawner(prim); //find and go to close spawner
 	}
@@ -290,7 +288,8 @@ void ConflictMode::moveNode(Person& prim, Person& closest)
 	}
 	if (!found) { //only happens when there is no one else to kill
 		prim.moveToCenter();
-		}
+
+	}
 }
 
 //the drafts don't affect people who were spawned after the draft was declared
@@ -314,7 +313,7 @@ void ConflictMode::fillAr(int x, int y, Colony col)
 
 void ConflictMode::spawn()
 {
-	if (allPlaced && ar.size() <= 100) {
+	if (allPlaced && ar.size() <= 80) { //max of 80 people on the board at once 
 		for (unsigned i = 0; i < spawners.size(); i++) {
 			Colony curCol(spawners[i].getFillColor());
 
@@ -417,12 +416,12 @@ void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 		yellowColAlive = yellowCurAlive;
 		checkIfColonyIsAlive();
 
-		//no need to do it crazy often, so just do it once every 1000 milliseconds
+		//no need to do it crazy often, so just do it once every 1000 milliseconds (ie 1 second)
 		if (elapsed_time.asMilliseconds() % 1000 == 0) {
 			checkForVictory(window);
 			decideWeatherEffects(); 
 		}
-		if (elapsed_time.asMilliseconds() % 20000 == 0 && weatherEffectsActive) { //every 20 seconds, weather should be reset
+		if (elapsed_time.asMilliseconds() % 30000 == 0 && weatherEffectsActive) { //every 30 seconds, weather should be reset
 			resetWeatherEffects();
 		}
 	}
@@ -478,9 +477,8 @@ void ConflictMode::removeSpawner(int spawnerIndex)
 
 void ConflictMode::spawnAnimal()
 {
-	int random = 1 + (rand() % 1000); //100000
-	int random2 = 1 + (rand() % 1000);
-	if (random == 1 && random2 == 1) {
+	int random = 1 + (rand() % 5000000); 
+	if (random == 1) {
 		int randomX = 1 + (rand() % 1280); //maybe lower these ranges slightly later 
 		int randomY = 1 + (rand() % 720);
 		fillAr(randomX, randomY, _otherCol);
@@ -519,7 +517,7 @@ void ConflictMode::setWeatherEffects()
 	case Updraft:
 		for (int i = 0; i < ar.size(); i++) {
 			if (!ar[i].weatherEffectsSet) {// if this hasn't already been applied
-				ar[i].upSpeed += .01f;
+				ar[i].upSpeed += .02f; //.03f 
 				ar[i].weatherEffectsSet = true;
 			}
 		}
@@ -529,7 +527,7 @@ void ConflictMode::setWeatherEffects()
 	case Downdraft:
 		for (int i = 0; i < ar.size(); i++) {
 			if (!ar[i].weatherEffectsSet) {
-				ar[i].downSpeed += .01f;
+				ar[i].downSpeed += .02f;
 				ar[i].weatherEffectsSet = true;
 			}
 		}
@@ -539,7 +537,7 @@ void ConflictMode::setWeatherEffects()
 	case Leftdraft:
 		for (int i = 0; i < ar.size(); i++) {
 			if (!ar[i].weatherEffectsSet) {
-				ar[i].leftSpeed += .01f;
+				ar[i].leftSpeed += .02f;
 				ar[i].weatherEffectsSet = true;
 			}
 		}
@@ -549,7 +547,7 @@ void ConflictMode::setWeatherEffects()
 	case Rightdraft:
 		for (int i = 0; i < ar.size(); i++) {
 			if (!ar[i].weatherEffectsSet) {
-				ar[i].rightSpeed += .01f;
+				ar[i].rightSpeed += .02f;
 				ar[i].weatherEffectsSet = true;
 			}
 		}
@@ -575,10 +573,6 @@ void ConflictMode::resetWeatherEffects()
 //not working upon the second iteration of playing the game - seems like numAlive isn't going to 1 for whatever reason 
 void ConflictMode::checkForVictory(sf::RenderWindow& window)
 {
-	for (int i = 0; i < 4; i++) {
-		cout << aliveCols[i] << endl;
-	}
-	cout << endl;
 	int numAlive = 0;
 	for (int i = 0; i < sizeof(aliveCols) / sizeof(aliveCols[0]); i++) {
 		if (aliveCols[i] == 1) {
@@ -588,7 +582,7 @@ void ConflictMode::checkForVictory(sf::RenderWindow& window)
 		if (numAlive > 1)
 			break;
 	}
-	if (numAlive == 1) {
+	if (numAlive == 1 || numAlive == 0) {
 		gameOver = true;
 	}
 }

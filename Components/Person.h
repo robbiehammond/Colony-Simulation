@@ -12,7 +12,6 @@ public:
 	sf::Vector2f position;
 	sf::CircleShape shape;
 
-	//idea for later maybe - if I give them all unique names, it would be pretty cool to be able to reference who got diseased and for the player to know what's going on. To give each person a name, maybe create a large array of strings storing possible names, and the program just chooses a random one. Don't know how this might affect runtime though. If I just fill the array at the very start, it might be okay actually, since arrays are random access. 
 	string name;
 
 	Colony myCol;

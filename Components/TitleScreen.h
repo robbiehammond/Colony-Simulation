@@ -9,7 +9,7 @@ using namespace std;
 class TitleScreen {
 public:
 	TitleScreen(sf::RenderWindow& _window, sf::Font& _font);
-	sf::RectangleShape createMapBox(float x, float y); //might need another field for image path later, or just get rid of the space later on
+	sf::RectangleShape createMapBox(float x, float y);
 	sf::Text createBoxText(string text, float x, float y);
 	sf::Texture getMapImages(string imgPath);
 	sf::Sprite createMapImages(sf::Texture& tex, float x, float y);

@@ -124,8 +124,6 @@ Mode TitleScreen::getSelectedMode()
 }
 
 
-
-
 void TitleScreen::loadScreen()
 {
 	sf::RectangleShape map0box = createMapBox(400, 100);
@@ -133,7 +131,7 @@ void TitleScreen::loadScreen()
 
 	sf::RectangleShape map1box = createMapBox(780, 100);
 	sf::Text map1text = createBoxText(" Map 1", 780, 200);
-	sf::Texture map1texture = getMapImages("Map1.png"); //gotta exist in this method to actually be able to see it
+	sf::Texture map1texture = getMapImages("Map1.png");
 	sf::Sprite map1sprite = createMapImages(map1texture, 780, 100);
 
 	sf::RectangleShape map2box = createMapBox(400, 300);
@@ -143,8 +141,8 @@ void TitleScreen::loadScreen()
 	
 	sf::RectangleShape map3box = createMapBox(780, 300);
 	sf::Text map3text = createBoxText(" Map 3", 780, 400);
-	//sf::Texture map3texture = getMapImages("Map3.png");
-	//sf::Sprite map3sprite = createMapImages(map3texture, 780, 100);
+	sf::Texture map3texture = getMapImages("Map3.png");
+	sf::Sprite map3sprite = createMapImages(map3texture, 780, 305);
 
 
 	sf::RectangleShape conflictBox = createOtherBox(910, 500, 270, 50, sf::Color::Red);
@@ -195,7 +193,7 @@ void TitleScreen::loadScreen()
 
 		window.draw(map3box);
 		window.draw(map3text);
-		//window.draw(map3sprite);
+		window.draw(map3sprite);
 
 		window.draw(projectDesc);
 		window.draw(title);

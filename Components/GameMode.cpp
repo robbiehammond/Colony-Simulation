@@ -47,7 +47,7 @@ bool GameMode::findHardClose(Person& prim)
 
 	Person placeholder(-10000, -100000, prim.myCol, prim.curMap);
 
-	float curMinDist = 400;
+	float curMinDist = 2000;
 
 	Person* saveNode = &prim;
 
@@ -58,6 +58,7 @@ bool GameMode::findHardClose(Person& prim)
 			break;
 		}
 	}
+	//if we return ourselves, there is no one around 
 	if (saveNode->shape.getPosition() == prim.shape.getPosition()) {
 		return false;
 	}
