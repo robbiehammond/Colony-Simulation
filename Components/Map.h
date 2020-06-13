@@ -20,6 +20,7 @@ class Map
 public:
 	Map( MapSelection _m);
 	string to_string();
+	void push_back(int startX, int endX, int startY, int endY);
 	map<MapSelection, string> stringMapNames;
 	MapSelection m;
 	vector<min_max> x_restrictions;

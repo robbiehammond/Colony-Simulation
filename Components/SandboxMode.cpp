@@ -136,7 +136,7 @@ void SandboxMode::getUserInput(sf::RenderWindow& window, sf::Event& event)
 		window.close();
 	}
 
-	if (ar.size() <= 1000) {
+	if (ar.size() <= 500) {
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
 			sf::Vector2i pos = sf::Mouse::getPosition(window);
