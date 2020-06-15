@@ -4,7 +4,6 @@
 Colony redCol(sf::Color::Red);
 Colony greenCol(sf::Color::Green);
 Colony blueCol(sf::Color::Blue);
-Colony animalColony(sf::Color::Yellow);
 
 SandboxMode::SandboxMode(sf::RenderWindow& _window, sf::Font& _font, Map _map)
 	: window(_window), font(_font), map(_map), button(_window, _font)
@@ -12,7 +11,6 @@ SandboxMode::SandboxMode(sf::RenderWindow& _window, sf::Font& _font, Map _map)
 	playGame();
 }
 
-//make this return a person&
 Person& SandboxMode::findClose(Person& prim)
 {
 	Person placeholder(-10000, -100000, prim.myCol, prim.curMap);
@@ -62,45 +60,20 @@ void SandboxMode::fillAr(int x, int y, Colony col)
 	}
 }
 
-void SandboxMode::randomSpawn()
-{
-	int random = 1 + (rand() % 100000);
-	int random2 = 1 + (rand() % 100000);
-	if (random == 1 && random2 == 1) {
-		int randomX = 1 + (rand() % 1280); //maybe lower these ranges slightly later 
-		int randomY = 1 + (rand() % 720);
-		fillAr(randomX, randomY, animalColony);
-	}
-}
-
 void SandboxMode::moveNode(Person& prim, Person& closest)
 {
 	float dist = prim.distance(closest);
+	//move if the close node isn't prim, it's within 1000 units, and it has a different color
 	if (dist != 0 && dist < 1000 && prim.myCol.color != closest.myCol.color) {
 		moveTowardNode(prim, closest);
 	}
+	//otherwise, just go to the center 
 	else
 	{
 		prim.moveToCenter();
 	}
 }
 
-void SandboxMode::removeAndShuffle(sf::Time& elapsed_time)
-{
-	int size = ar.size();
-	for (int i = 0; i < size; i++)
-	{
-		if (ar[i].health <= 0)
-		{
-			ar.erase(ar.begin() + i);
-			size = ar.size();
-		}
-	}
-	if (elapsed_time.asMilliseconds() % 400) {
-		random_shuffle(ar.begin(), ar.end());
-		randomSpawn();
-	}
-}
 
 void SandboxMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 {
@@ -119,7 +92,7 @@ void SandboxMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 	}
 }
 
-bool SandboxMode::detectExitClick(exitButton button)
+bool SandboxMode::detectExitClick(ExitButton button)
 {
 	sf::Vector2f mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 	sf::FloatRect bound = button.outline.getGlobalBounds();

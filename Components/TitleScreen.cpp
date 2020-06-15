@@ -9,14 +9,15 @@ TitleScreen::TitleScreen(sf::RenderWindow& _window, sf::Font& _font)
 {
 	projectDesc.setCharacterSize(10);
 	projectDesc.setPosition(1060, 690);
+
 	title.setString("Colony Simulator");
 	title.setFont(font);
 	title.setPosition(450, 25);
 	title.setCharacterSize(50);
 	title.setFillColor(sf::Color::White);
+
 	loadScreen();
 }
-
 
 sf::RectangleShape TitleScreen::createMapBox(float x, float y)
 {
@@ -26,7 +27,6 @@ sf::RectangleShape TitleScreen::createMapBox(float x, float y)
 	box.setOutlineThickness(2);
 	box.setFillColor(sf::Color::Black);
 	return box;
-
 }
 
 sf::Text TitleScreen::createBoxText(string text, float x, float y)
@@ -47,6 +47,7 @@ sf::Sprite TitleScreen::createMapImages(sf::Texture& tex, float x, float y)
 {
 	sf::Sprite mapSprite(tex);
 	mapSprite.setPosition(x, y);
+	//an optimal scale found through trial and error
 	mapSprite.setScale(.075, .12);
 	return mapSprite;
 }
@@ -70,17 +71,18 @@ sf::Text TitleScreen::createOtherText(float x, float y, float size, sf::Color co
 	return words;
 }
 
-
 bool TitleScreen::clickInRange(sf::RectangleShape& object)
 {
 	sf::Vector2f mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 	sf::FloatRect bound = object.getGlobalBounds();
+	//if a left click occured and it's within the bounds of the object, the click was in range. Otherwise, it was not 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && bound.contains(mouseCoords))
 		return true;
 	else 
 		return false;
 }
 
+//sets the color of the map boxes based on which one was last clicked. Used to show which map has been selected
 void TitleScreen::setColorOnClick(sf::RectangleShape& box0, sf::RectangleShape& box1, sf::RectangleShape& box2, sf::RectangleShape& box3)
 {
 	if (clickInRange(box0)) {
@@ -123,7 +125,7 @@ Mode TitleScreen::getSelectedMode()
 	return selectedMode;
 }
 
-
+//the equivalent of playGame() for the title screen
 void TitleScreen::loadScreen()
 {
 	sf::RectangleShape map0box = createMapBox(400, 100);
@@ -152,10 +154,14 @@ void TitleScreen::loadScreen()
 	sf::RectangleShape aboutBox = createOtherBox(590, 500, 100, 50, sf::Color::Blue);
 	sf::Text aboutText = createOtherText(600, 500, 30, sf::Color::Blue, "About");
 
+	//once playingGame is true, we break this loop to move onto the actual game 
 	bool playingGame = false;
+
 	while (window.isOpen() && !playingGame) {
+
 		sf::Event event;
 		while (window.pollEvent(event)) {
+			//if one of the modes has been clicked, play that mode
 			if (event.type == sf::Event::Closed)
 			{
 				window.close();
@@ -180,8 +186,12 @@ void TitleScreen::loadScreen()
 
 		}
 		window.clear();
+
+		//draw everything to the screen
+
 		window.draw(map0box);
 		window.draw(map0text);
+		//no sprite for map0 bc the map itself is just blank
 
 		window.draw(map1box);
 		window.draw(map1text);

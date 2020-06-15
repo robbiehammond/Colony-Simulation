@@ -3,28 +3,22 @@
 #include <fstream>
 #include <vector>
 
-/*
-global event possibilities
--whenever a spawner is removed - finished
--whenever all members of a colony die - fininshed 
--whenever a powerup is placed on the board - yep fuck that 
-*/
 using namespace std;
 
-//colonies and a bool values for displayed messages 
-Colony _redCol(sf::Color::Red); //index 1
+//colonies and bool values for displayed messages 
+Colony _redCol(sf::Color::Red); //index 0
 bool redColAlive = true;
 bool redDeathMessageDisplayed = false;
 
-Colony _greenCol(sf::Color::Green); //index 2
+Colony _greenCol(sf::Color::Green); //index 1
 bool greenColAlive = true;
 bool greenDeathMessageDisplayed = false;
 
-Colony _blueCol(sf::Color::Blue); //index 3
+Colony _blueCol(sf::Color::Blue); //index 2
 bool blueColAlive = true;
 bool blueDeathMessageDisplayed = false;
 
-Colony _yellowColony(sf::Color::Yellow); //index 4
+Colony _yellowColony(sf::Color::Yellow); //index 3
 bool yellowColAlive = true;
 bool yellowDeathMessageDisplayed = false;
 
@@ -35,16 +29,20 @@ bool aliveCols[] = { 1, 1, 1, 1 }; //everyone starts out alive
 //animals
 Colony _otherCol(sf::Color::White);
 
-bool allPlaced = false; //victory achieved 
+//when true, game actually starts 
+bool allPlaced = false;
 
-vector<string> assignableNames; //currently 1188 size, can be increased.
+//names of the people. Can be increased by just adding a name to the end 
+vector<string> assignableNames;
 
-vector<sf::RectangleShape> spawners; //keep all the spawners here
+//keep all the spawners here
+vector<sf::RectangleShape> spawners;
 
+//when true, the main game loop breaks 
 bool gameOver = false;
 
+//weather affects in the game, starts out with no weather 
 Weather weather;
-
 bool weatherEffectsActive = false;
 
 
@@ -57,7 +55,6 @@ ConflictMode::ConflictMode(sf::RenderWindow& _window, sf::Font& _font, Map _map)
 
 }
 
-//fills the name array from the name file 
 void ConflictMode::fillNameArray()
 {
 	string curline;
@@ -70,18 +67,23 @@ void ConflictMode::fillNameArray()
 	}
 }
 
-//maybe not always have this be void 
 void ConflictMode::setSpawnPoints()
 {
 		sf::Vector2f mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
 		sf::RectangleShape rect(sf::Vector2f(50, 50));
 		rect.setPosition(mouseCoords);
+
+		//placeholder person to make sure that the spawners are being put in valid locations 
 		Person placehold(mouseCoords.x, mouseCoords.y, _otherCol, map);
-		if (placehold.checkBounds(mouseCoords.x, mouseCoords.y)) {
+
+		if (placehold.checkBounds(mouseCoords.x, mouseCoords.y)) 
+		{
+			//switch the color of the spawner based on the size - first spawner will be red, next will be blue, etc 
 			switch (spawners.size()) {
 			case 0:
 				rect.setFillColor(sf::Color::Red);
-				sf::sleep(sf::milliseconds(200));
+				sf::sleep(sf::milliseconds(200));	//wait some milliseconds to avoid double clicks 
 				spawners.push_back(rect);
 				break;
 			case 1:
@@ -103,14 +105,15 @@ void ConflictMode::setSpawnPoints()
 				break;
 			}
 		}
-		//rect.setFillColor(curCol.color);
 }
 
+//find any node that is relatively close
 Person& ConflictMode::findClose(Person& prim)
 {
 	Person placeholder(-10000, -100000, prim.myCol, prim.curMap);
 
-	float curMinDist = 400; //settable min detection distance
+	//settable min detection distance
+	float curMinDist = 400;
 
 	//points to a close (but not necessarily closest) node. Starts of as the current node that's searching.
 	Person* saveNode = &prim;
@@ -128,6 +131,7 @@ Person& ConflictMode::findClose(Person& prim)
 				}
 			}
 		}
+
 		//if this node is close enough to be found and this node isn't itself, continue
 		if (curNodeDist < curMinDist && curNodeDist != 0 && prim.myCol.color != ar[i].myCol.color) {
 			//the close node is now an actual close node, and not just the searching node
@@ -135,18 +139,18 @@ Person& ConflictMode::findClose(Person& prim)
 			break;
 		}
 	}
-	//if we didn't find a close one and the close one is just this one, return a node out of bounds - other methods will interpret this 
-	if (saveNode->shape.getPosition() == prim.shape.getPosition()) {
+	//if we didn't find a close one and the close one is just this one, return a node out of bounds - other methods will interpret this as invalid 
+	if (saveNode->shape.getPosition() == prim.shape.getPosition()) 
 		return placeholder;
-	}
+	//otherwise, return the valid, close node
 	else
 		return *saveNode;
 }
 
-
 void ConflictMode::mutate(Person& person)
 {
 	int random = 1 + (rand() % 1000);
+
 	//mutation 1: get healthier
 	if (random == 500)
 	{
@@ -156,6 +160,7 @@ void ConflictMode::mutate(Person& person)
 	if (random == 501) {
 		person.damage += 1;
 	}
+
 	//mutation 3: get faster
 	if (random == 502) {
 		person.upSpeed += .05;
@@ -163,18 +168,20 @@ void ConflictMode::mutate(Person& person)
 		person.leftSpeed += .05;
 		person.rightSpeed += .05;
 	}
+
 	//mutation 4: if diseased, SUFFER
-	if (random % 100 == 0) { //modulo so it's a bit more common 
+	if (random % 100 == 0) {
 		person.sufferDiseaseEffects();
 	}
 }
 
-//if a spawner is close (maybe within 50?), ignore all other nodes and go to spawner 
+//function the decide of a spawner of another color is close
 bool ConflictMode::otherSpawnerClose(Person& prim)
 {
 	int x = prim.shape.getPosition().x;
 	int y = prim.shape.getPosition().y;
 	for (unsigned i = 0; i < spawners.size(); i++) {
+		//if both the x and y coordinates of the spawner are within a distance of 100 from the x and y coordinates of prim, the spawner is close
 		if (abs(spawners[i].getPosition().x - x) < 100 && abs(spawners[i].getPosition().y - y) < 100 && spawners[i].getFillColor() != prim.myCol.color) {
 			return true;
 		}
@@ -187,6 +194,7 @@ bool ConflictMode::otherSpawnerSomewhatClose(Person& prim)
 	int x = prim.shape.getPosition().x;
 	int y = prim.shape.getPosition().y;
 	for (unsigned i = 0; i < spawners.size(); i++) {
+		//if the x and y are within 2000, the spawner is relatively close
 		if (abs(spawners[i].getPosition().x - x) < 2000 && abs(spawners[i].getPosition().y - y) < 2000 && spawners[i].getFillColor() != prim.myCol.color) {
 			return true;
 		}
@@ -194,11 +202,9 @@ bool ConflictMode::otherSpawnerSomewhatClose(Person& prim)
 	return false;
 }
 
-
-//this works, but it's kinda ugly
 void ConflictMode::checkIfColonyIsAlive()
 {
-	//death messages are still true for some reason
+	
 	bool redSpawnerFound = false;
 	bool greenSpawnerFound = false;
 	bool blueSpawnerFound = false;
@@ -214,6 +220,8 @@ void ConflictMode::checkIfColonyIsAlive()
 			yellowSpawnerFound = true;
 	}
 
+	//if the colony's spawner could not be found, the colony itself was declared to be dead, and the death message hasn't been displayed,
+	//show the death message, remember that it has been showed for this colony, then set the colony's array index to 0 (to indicate death)
 	if (!redSpawnerFound && !redColAlive && !redDeathMessageDisplayed) {
 		updateStatusBar(bar, "Red Colony is Eliminated!");
 		redDeathMessageDisplayed = true;
@@ -242,64 +250,58 @@ void ConflictMode::getUserInput(sf::RenderWindow& window, sf::Event& event)
 	{
 		window.close();
 	}
-
-	if (event.type == sf::Event::KeyPressed)
-	{
-		if (event.key.code == sf::Keyboard::A)
-		{
-			cout << ar.size() << endl;
-		}
-	}
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
-	{
-		sf::Vector2i pos = sf::Mouse::getPosition(window);
-		fillAr(pos.x, pos.y, _greenCol);
-	}
-
 }
 
-
-
-//this function needs to be made into something non-spaghetti
-//we're double passing addresses!
 void ConflictMode::moveNode(Person& prim, Person& closest)
 {
-	bool found = false; //if a node has been found or not 
+	//if a node has been found or not 
+	bool found = false;
+
+	//distance from the close node 
 	float dist = prim.distance(closest);
 
-	//if the closest node isn't this node, isn't extremely far away, and it has a different color, move towards it
+	//if the closest node isn't the same node, isn't extremely far away, and it has a different color, move towards it
 	if (dist != 0 && dist < 1000 && prim.myCol.color != closest.myCol.color) {
 		found = true;
 		moveTowardNode(prim, closest);
 	}
-	else if (spawners.size() > 0 && otherSpawnerSomewhatClose(prim)) { //if there's more spawners and they're somewhat close, and we couldn't find anyone close,  find the spawner 
+
+	//if there's still spawners and they're somewhat close, and we couldn't find anyone who matches the above description, find the spawner
+	else if (spawners.size() > 0 && otherSpawnerSomewhatClose(prim)) { 
 		findSpawner(prim);
 		found = true;
 	}
-	else if (spawners.size() == 1 && spawners[0].getFillColor() != prim.myCol.color) { //only spawner on board matches doesn't this person's color 
-		findSpawner(prim); //find and go to close spawner
+
+	//if the only spawner on board doesn't match this person's color, find their spawner
+	else if (spawners.size() == 1 && spawners[0].getFillColor() != prim.myCol.color) { 
+		findSpawner(prim); 
 	}
-	else if (spawners.size() == 1 && spawners[0].getFillColor() == prim.myCol.color) { //and there are still other people around.
+
+	//if the only spawner on board matches this person's color, find a close node, a return a bool value for if a close one was found
+	else if (spawners.size() == 1 && spawners[0].getFillColor() == prim.myCol.color) {
 		found = findHardClose(prim);
 	}
-	//if none of the above happened, then found needs to be set to false to do below 
+
+	//if no spawners are on the board and none of the above worked, no one was found  
 	else if (spawners.size() == 0) {
 		found = false;
 	}
-	if (!found) { //only happens when there is no one else to kill
+
+	//if no one was found, go to the center 
+	if (!found) { 
 		prim.moveToCenter();
 
 	}
 }
 
-//the drafts don't affect people who were spawned after the draft was declared
 void ConflictMode::fillAr(int x, int y, Colony col)
 {
 	Person p(x, y, col, map.m);
+	//if the person spawned is an animal, give them some beefy stats 
 	if (p.myCol.color == sf::Color::White) {
 		p.damage = 10;
 		p.updateHealth(60);
-		p.defaultSpeed = .5; //these animals are much faster than people too
+		p.defaultSpeed = .5; 
 	}
 	//make sure they're being filled in a correct map range
 	if (p.checkBounds(p.position.x, p.position.y)) {
@@ -309,18 +311,21 @@ void ConflictMode::fillAr(int x, int y, Colony col)
 	}
 }
 
-
-
 void ConflictMode::spawn()
 {
-	if (allPlaced && ar.size() <= 80) { //max of 80 people on the board at once 
+	//don't allow more than 80 people on the board at once 
+	if (allPlaced && ar.size() <= 80) {
 		for (unsigned i = 0; i < spawners.size(); i++) {
 			Colony curCol(spawners[i].getFillColor());
 
-			const int num = (1.0 / (2.0 * spawners[i].getSize().x)) * 10000; //100 at normal size
+			//number to change the spawn rate based on the size of the spawner
+			const int num = (1.0 / (2.0 * spawners[i].getSize().x)) * 10000;
+
 			int random = 1 + (rand() % num); 
 			int random2 = 1 + (rand() % num);
-			if (random == 5 && random2 == 5) {
+
+			//if luck is in our favor, spawn someone 
+			if (random == 1 && random2 == 2) {
 				fillAr(spawners[i].getPosition().x, spawners[i].getPosition().y, curCol);
 			}
 		}
@@ -329,47 +334,53 @@ void ConflictMode::spawn()
 
 void ConflictMode::findSpawner(Person& prim)
 {
+	//index of the close spawner - currently invalid
+	int closest = 5;
 
-		int closest = 5;
-		float dist = 10000;
-		for (unsigned i = 0; i < spawners.size(); i++) {
-			//update, find the shape with the closest distance 
-			float dx = spawners[i].getPosition().x - prim.position.x;
-			float dy = spawners[i].getPosition().y - prim.position.y;
-			float curDist = sqrt(dx * dx + dy * dy);
-			if (curDist < dist && spawners[i].getFillColor() != prim.myCol.color) {
-				dist = curDist;
-				closest = i;
-			}
+	//distance from the spawner - currently something way too big 
+	float dist = 10000;
+
+	//find the spawner with the lowest dist, then save its index
+	for (unsigned i = 0; i < spawners.size(); i++) {
+		float dx = spawners[i].getPosition().x - prim.position.x;
+		float dy = spawners[i].getPosition().y - prim.position.y;
+		float curDist = sqrt(dx * dx + dy * dy);
+		if (curDist < dist && spawners[i].getFillColor() != prim.myCol.color) {
+			dist = curDist;
+			closest = i;
 		}
-		if (closest < 5) {
-			sf::Vector2f curScale = spawners[closest].getSize();
-			float dx = spawners[closest].getPosition().x - prim.position.x;
-			float dy = spawners[closest].getPosition().y - prim.position.y;
-			int i = 0;
-			while (i < 2) {
-				if (dx > 0)
-					prim.moveRight();
-				if (dx < 0)
-					prim.moveLeft();
-				if (dy > 0)
-					prim.moveDown();
-				if (dy < 0)
-					prim.moveUp();
-				if (prim.shape.getGlobalBounds().intersects(spawners[closest].getGlobalBounds()) && spawners[closest].getFillColor() != prim.myCol.color) {
-					//make this a bit more complex than simply removing 5 each time it is hit. Maybe make it based on the person's strength/health?
-					curScale.x = curScale.x - 5;
-					curScale.y = curScale.y - 5;
-					spawners[closest].setSize(curScale);
-				}
-				i++;
+	}
+
+	//if we found a valid spawner, move towards it 
+	if (closest < 5) {
+		sf::Vector2f curScale = spawners[closest].getSize();
+		float dx = spawners[closest].getPosition().x - prim.position.x;
+		float dy = spawners[closest].getPosition().y - prim.position.y;
+		int i = 0;
+		while (i < 2) {
+			if (dx > 0)
+				prim.moveRight();
+			if (dx < 0)
+				prim.moveLeft();
+			if (dy > 0)
+				prim.moveDown();
+			if (dy < 0)
+				prim.moveUp();
+			//if they intersect, make the spawner take damage 
+			if (prim.shape.getGlobalBounds().intersects(spawners[closest].getGlobalBounds()) && spawners[closest].getFillColor() != prim.myCol.color) {
+				curScale.x = curScale.x - prim.damage;
+				curScale.y = curScale.y - prim.damage;
+				spawners[closest].setSize(curScale);
 			}
+			i++;
 		}
+	}
 
 }
 
 void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 {
+	//flags that check on every time this function is called if each colony is still alive 
 	bool redCurAlive = false;
 	bool greenCurAlive = false;
 	bool blueCurAlive = false;
@@ -377,7 +388,7 @@ void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 	if (!ar.empty()) {
 		for (auto& i : ar)
 		{
-			//check if at least one person from a given colony is alive - if not found when looping through the entire array, the whole colony must be gone.
+			//check if at least one person from a given colony is alive - if not found when looping through the entire array, the whole colony must be gone
 			if (i.myCol.color == sf::Color::Red)
 				redCurAlive = true;
 			else if (i.myCol.color == sf::Color::Green)
@@ -392,6 +403,7 @@ void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 				if (otherSpawnerClose(i)) {
 					findSpawner(i);
 				}
+
 				else {
 					Person* p = &findClose(i); 
 					//random chance to generate a disease
@@ -410,18 +422,20 @@ void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 			move(i);
 			window.draw(i.shape);
 		}
+		//save the local values into the global ones 
 		redColAlive = redCurAlive;
 		greenColAlive = greenCurAlive;
 		blueColAlive = blueCurAlive;
 		yellowColAlive = yellowCurAlive;
 		checkIfColonyIsAlive();
 
-		//no need to do it crazy often, so just do it once every 1000 milliseconds (ie 1 second)
+		//check for a victory and decide weather conditions each second 
 		if (elapsed_time.asMilliseconds() % 1000 == 0) {
 			checkForVictory(window);
 			decideWeatherEffects(); 
 		}
-		if (elapsed_time.asMilliseconds() % 30000 == 0 && weatherEffectsActive) { //every 30 seconds, weather should be reset
+		//every 30 seconds, reset the weather effects 
+		if (elapsed_time.asMilliseconds() % 30000 == 0 && weatherEffectsActive) {
 			resetWeatherEffects();
 		}
 	}
@@ -432,6 +446,7 @@ void ConflictMode::updateSpawners(sf::RenderWindow& window)
 	int spawnerSize = spawners.size();
 	for (int i = 0; i < spawnerSize; i++) {
 		spawn();
+		//take it off the screen if it's size is 0 or less
 		if (spawners[i].getSize().x <= 0 && spawners[i].getSize().y <= 0) {
 			removeSpawner(i);
 			spawnerSize = spawners.size();
@@ -441,24 +456,7 @@ void ConflictMode::updateSpawners(sf::RenderWindow& window)
 	}
 }
 
-void ConflictMode::removeAndShuffle(sf::Time& elapsed_time)
-{
-	int size = ar.size();
-	for (int i = 0; i < size; i++)
-	{
-		if (ar[i].health <= 0)
-		{
-			ar.erase(ar.begin() + i);
-			size = ar.size();
-		}
-	}
-	if (elapsed_time.asMilliseconds() % 200) {
-		random_shuffle(ar.begin(), ar.end());
-	}
-}
-
-
-bool ConflictMode::detectExitClick(exitButton button)
+bool ConflictMode::detectExitClick(ExitButton button)
 {
 	sf::Vector2f mouseCoords = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 	sf::FloatRect bound = button.outline.getGlobalBounds();
@@ -479,8 +477,8 @@ void ConflictMode::spawnAnimal()
 {
 	int random = 1 + (rand() % 5000000); 
 	if (random == 1) {
-		int randomX = 1 + (rand() % 1280); //maybe lower these ranges slightly later 
-		int randomY = 1 + (rand() % 720);
+		int randomX = 1 + (rand() % 1250); 
+		int randomY = 1 + (rand() % 690);
 		fillAr(randomX, randomY, _otherCol);
 		updateStatusBar(bar, "An Vicious Animal Has Spawned!");
 	}
@@ -507,20 +505,24 @@ void ConflictMode::decideWeatherEffects()
 			weather = NoWeather;
 			break;
 		}
+		//once decided, set the weather effects 
 		setWeatherEffects();
 	}
 }
 
 void ConflictMode::setWeatherEffects()
 {
+	//for each person on the screen, if  their weather effect flag hasn't been set, change their speed accordingly, and then set their weather effects flag to true
+	//then update the global flag for the weather effects and put a message on the screen
 	switch (weather) {
 	case Updraft:
 		for (int i = 0; i < ar.size(); i++) {
-			if (!ar[i].weatherEffectsSet) {// if this hasn't already been applied
-				ar[i].upSpeed += .02f; //.03f 
+			if (!ar[i].weatherEffectsSet) {
+				ar[i].upSpeed += .02f; 
 				ar[i].weatherEffectsSet = true;
 			}
 		}
+		
 		weatherEffectsActive = true;
 		updateStatusBar(bar, "An upwards breeze hit the nodes!");
 		break;
@@ -556,7 +558,7 @@ void ConflictMode::setWeatherEffects()
 		break;
 	case NoWeather:
 		break;
-	default: //just in case I add anything else later on 
+	default: 
 		break;
 	}
 }
@@ -570,7 +572,6 @@ void ConflictMode::resetWeatherEffects()
 	updateStatusBar(bar, "The breeze has subsided");
 }
 
-//not working upon the second iteration of playing the game - seems like numAlive isn't going to 1 for whatever reason 
 void ConflictMode::checkForVictory(sf::RenderWindow& window)
 {
 	int numAlive = 0;
@@ -614,9 +615,10 @@ string ConflictMode::declareWinner()
 {
 	bool aliveColFound = false;
 	int i = 0;
-	int aliveIndex = -1; //something invalid
+	//something invalid
+	int aliveIndex = -1;
 	//find out which colony is alive - should be either 1 or 0, depending if the colonies all kill each other or not 
-	while (i < 4 && !aliveColFound) { //make this 4 value into a variable that just knows the number of starting colonies
+	while (i < 4 && !aliveColFound) {
 		if (aliveCols[i] == 1) {
 			aliveColFound = true;
 			aliveIndex = i;
@@ -641,16 +643,18 @@ string ConflictMode::declareWinner()
 	return "Everyone annihilated each other...\nThere is no winner.";
 }
 
-
 void ConflictMode::playGame()
 {
+	//start the clock
 	sf::Clock r;
 	sf::Time elapsed_time;
 
+	//load the map texture
 	sf::Texture maptext;
 	maptext.loadFromFile(map.to_string());
 	sf::Sprite map(maptext);
 
+	//game loop
 	while (window.isOpen() && !detectExitClick(button) && !gameOver) {
 
 		elapsed_time += r.restart();
@@ -669,10 +673,11 @@ void ConflictMode::playGame()
 		drawStatusBar(bar);
 		drawExitButton(button);
 
+		//pre-game spawner placement logic
 		if (event.type == event.MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left && !allPlaced)
 			setSpawnPoints();
 		if (spawners.size() == 4) {
-			if (!allPlaced) //so that it only displays once
+			if (!allPlaced) 
 				updateStatusBar(bar, "Let the simulation begin!");
 			allPlaced = true;
 		}

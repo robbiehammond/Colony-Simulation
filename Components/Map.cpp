@@ -1,6 +1,6 @@
 #pragma once
 #include "Map.h"
-
+#include <stdexcept>
 #include <iostream>
 
 
@@ -14,7 +14,6 @@ Map::Map(const MapSelection _m)
 	setRestrictions();
 }
 
-//puts boundaries on the edges of the screen
 void Map::setScreenBoundaries()
 {
 	//left boundary
@@ -32,8 +31,6 @@ void Map::setScreenBoundaries()
 
 void Map::setRestrictions()
 {
-
-	//before switch, put bounds that are the same for every map (ie edge boundaries)
 	
 	switch (m) {
 	case Map0:
@@ -105,7 +102,8 @@ void Map::setRestrictions()
 		break;
 
 	default:
-		std::cout << "We got problems" << endl;
+		break;
+		
 	}
 }
 

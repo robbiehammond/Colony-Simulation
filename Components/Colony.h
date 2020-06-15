@@ -8,6 +8,9 @@ class Colony
 {
 public:
 	Colony(sf::Color _color);
+
+	//converts the SFML colors to basic strings, because the SFML library unfortunately does not have native support for it 
 	string to_string();
+
 	sf::Color color;
 };

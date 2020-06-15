@@ -8,15 +8,6 @@
 #include "ConflictMode.h"
 #include "AboutScreen.h"
 
-/*
-specific plans:
-
-	make 3rd map, and make first and second map look better - Friday
-
-	Clean up Code! - Saturday and Sunday
-
-*/
-
 //the selected Game mode
 Mode selectedMode;
 
@@ -25,9 +16,16 @@ Map theMap(Map0);
 
 int main()
 {
+	//the window where all the events are displayed
 	sf::RenderWindow window(sf::VideoMode(1280, 720), "My window", sf::Style::Close);
+
+	//font for all the text
 	sf::Font font;
-	font.loadFromFile("arial.ttf"); //choose a more interesting font later
+	font.loadFromFile("arial.ttf"); 
+
+	//game loop
+	//when the constructor of a given mode is called, the playGame() function is called, which calls the main game loop for that mode
+	//thus, once the main game loop for that mode is broken, the program is brought back to this loop, which will just keep displaying the title screen until another mode is selected
 	while (window.isOpen()) {
 
 		TitleScreen title(window, font);

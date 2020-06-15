@@ -1,12 +1,9 @@
 #include "GameMode.h"
 #include <iostream>
 
-
-
-
+//because SFML has no built in toString function
 string GameMode::sfColorToString(sf::Color color)
 {
-	//can't use a switch statement unfortunately 
 	if (color == sf::Color::Red)
 		return "Red";
 	else if (color == sf::Color::Blue)
@@ -21,6 +18,7 @@ string GameMode::sfColorToString(sf::Color color)
 		return "[Invalid Game Color Input]";
 }
 
+//randomly move a preson up, down, left, or right
 void GameMode::move(Person& p)
 {
 	int random = 1 + (rand() % 4);
@@ -41,7 +39,7 @@ void GameMode::move(Person& p)
 }
 
 
-//unlike the other findClose function where a placeholder could be returned, this one always makes finds and moves a node towards another one as long as there are more nodes of different colors left on the screen
+//function that returns a value for if a node was found 
 bool GameMode::findHardClose(Person& prim)
 {
 
@@ -73,7 +71,7 @@ bool GameMode::findHardClose(Person& prim)
 	return true;
 }
 
-//this could go in person class, but I'll leave that for if I feel like doing it later 
+//move one node toward another one 
 void GameMode::moveTowardNode(Person& prim, Person& closest)
 {
 	int i = 0;
@@ -98,25 +96,44 @@ void GameMode::moveTowardNode(Person& prim, Person& closest)
 	}
 }
 
+void GameMode::removeAndShuffle(sf::Time& elapsed_time)
+{
+	int size = ar.size();
+	for (int i = 0; i < size; i++)
+	{
+		if (ar[i].health <= 0)
+		{
+			ar.erase(ar.begin() + i);
+			size = ar.size();
+		}
+	}
+	if (elapsed_time.asMilliseconds() % 400) {
+		random_shuffle(ar.begin(), ar.end());
+	}
+}
+
+//logic to put the status bar on the screen
 void GameMode::drawStatusBar(StatusBar& s)
 {
 	s.window.draw(s.outline);
 	s.window.draw(s.displayedText);
 }
 
+//logic to update it with events
 void GameMode::updateStatusBar(StatusBar& bar, string s)
 {
 	bar.displayedText.setString(s);
 }
 
-void GameMode::drawExitButton(exitButton& button)
+
+//put the exit button on the screen
+void GameMode::drawExitButton(ExitButton& button)
 {
 	button.window.draw(button.outline);
 	button.window.draw(button.closeText);
 }
 
-
-
+//StatusBar constructor implementation
 StatusBar::StatusBar(sf::RenderWindow& _window, sf::Font& _font)
 	: outline(sf::Vector2f(450, 25)), window(_window), font(_font)
 {
@@ -131,7 +148,8 @@ StatusBar::StatusBar(sf::RenderWindow& _window, sf::Font& _font)
 	displayedText.setString("Place your 4 spawners where you'd like");
 }
 
-exitButton::exitButton(sf::RenderWindow& _window, sf::Font& _font)
+//ExitButton constructor 
+ExitButton::ExitButton(sf::RenderWindow& _window, sf::Font& _font)
 	: outline(sf::Vector2f(25, 25)), window(_window), font(_font)
 {
 	outline.setPosition(sf::Vector2f(1255, 0));

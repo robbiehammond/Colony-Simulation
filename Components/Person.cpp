@@ -21,7 +21,8 @@ Person::Person(float startX, float startY, Colony _col, Map _curMap)
 	shape.setRadius(radius);
 	myCol = _col;
 
-	name = ""; //to be initialized in conflict mode and left blank in sandbox mode
+	//to be initialized in conflict mode and left blank in sandbox mode
+	name = "";
 
 	upSpeed = 0.2f;
 	downSpeed = 0.2f;
@@ -30,13 +31,10 @@ Person::Person(float startX, float startY, Colony _col, Map _curMap)
 
 }
 
-
-
-//checking the same bounds twice here, do it only once by using a variable
 void Person::moveUp()
 {
 	float temp = position.y;
-	temp -= defaultSpeed; //flip this to the correct stuff 
+	temp -= defaultSpeed;
 	//check if where they're trying to move is a valid position
 	if (checkBounds(position.x, temp))
 	{
@@ -119,7 +117,6 @@ void Person::moveLeft()
 	}
 }
 
-
 void Person::moveRight()
 {
 	
@@ -153,6 +150,7 @@ void Person::moveToCenter()
 {
 	int i = 0;
 	while (i < 3) {
+		//640 = halfway across, 360 = halfway down 
 		float dx = 640 - position.x;
 		float dy = 360 - position.y;
 		if (dx > 0)
@@ -167,6 +165,7 @@ void Person::moveToCenter()
 	}
 
 }
+
 
 float Person::distance(Person& other)
 {
@@ -184,6 +183,7 @@ void Person::updateRadius(float _radius)
 void Person::updateHealth(float _health)
 {
 	health = _health;
+	//the radius of a person reflects their relative health, so update that to match the health 
 	updateRadius(health);
 }
 
@@ -197,46 +197,24 @@ bool Person::checkBounds(float x, float y)
 {
 	float x_coord = position.x;
 	float y_coord = position.y;
-	MapSelection map = curMap.m;
 
-	//only need to loop through x_restrictions, because x and y restrictions are the same size
+	//only need to loop through x_restrictions as the index bound, because x and y restrictions are the same size
 	for (int i = 0; i < curMap.x_restrictions.size(); i++) {
-		switch (map)
-		{
-		case Map0:
-			if (x_coord >= std::get<0>(curMap.x_restrictions[i]) && x_coord <= std::get<1>(curMap.x_restrictions[i]) && y_coord >= std::get<0>(curMap.y_restrictions[i]) && y_coord <= std::get<1>(curMap.y_restrictions[i])) {
-				return false;
-			}
-		case Map1:
-			if (x_coord >= std::get<0>(curMap.x_restrictions[i]) && x_coord <= std::get<1>(curMap.x_restrictions[i]) && y_coord >= std::get<0>(curMap.y_restrictions[i]) && y_coord <= std::get<1>(curMap.y_restrictions[i])) {
-				return false;
-			}
-			break;
-		case Map2:
-			if (x_coord >= std::get<0>(curMap.x_restrictions[i]) && x_coord <= std::get<1>(curMap.x_restrictions[i]) && y_coord >= std::get<0>(curMap.y_restrictions[i]) && y_coord <= std::get<1>(curMap.y_restrictions[i])) {
-				return false;
-			}
-			break;
-		case Map3:
-			if (x_coord >= std::get<0>(curMap.x_restrictions[i]) && x_coord <= std::get<1>(curMap.x_restrictions[i]) && y_coord >= std::get<0>(curMap.y_restrictions[i]) && y_coord <= std::get<1>(curMap.y_restrictions[i])) {
-				return false;
-			}
-			break;
-		default:
-			return true;
+		//if the x-coord of the set of restrictions we're on is greater than the min restriction (get<0>), and the x-coord of the set of restrictions is less than the max restriction
+		//(get<1>), and the same thing applies to the y-coords...
+		//this is an invalid location, so return false
+		if (x_coord >= std::get<0>(curMap.x_restrictions[i]) && x_coord <= std::get<1>(curMap.x_restrictions[i]) && y_coord >= std::get<0>(curMap.y_restrictions[i]) && y_coord <= std::get<1>(curMap.y_restrictions[i])) {
+			return false;
 		}
 	}
-	//if that for loop is skipped altogether, that means there are no restrictions, so return true bc all coordinates are valid
 	return true;
 }
 
-
-//alter the rate at which disease spreads, bc it's a bit too fast right now 
 bool Person::generateDisease()
 {
 	//only generate disease if they're not already diseased 
 	if (!isDiseased) {
-		int random = 1 + (rand() % 10000); //100000
+		int random = 1 + (rand() % 40000); //100000
 		if (random == 1) {
 			isDiseased = true;
 			setDiseaseEffects();
@@ -266,11 +244,11 @@ void Person::setDiseaseEffects()
 	}
 }
 
-//who we spread disease to is found through ConflictMode file
+
 //returns if the disease was successfully spread
 bool Person::spreadDisease(Person& other)
 {
-	//if we are diseased and the other person is not diseased 
+	//if we are diseased and the other person is not diseased, then spread the disease
 	if (isDiseased && !other.isDiseased) {
 		other.isDiseased = true;
 		other.setDiseaseEffects();
@@ -279,6 +257,7 @@ bool Person::spreadDisease(Person& other)
 	return false;
 }
 
+//possibly get rid of the disease and stop suffering from its effects 
 bool Person::recoverFromDisease()
 {
 	int random = 1 + (rand() % 1000);
@@ -300,11 +279,11 @@ bool Person::recoverFromDisease()
 	return false;
 }
 
-//make sure you mention that disease slows people to a halt and hurts them 
 void Person::sufferDiseaseEffects()
 {
 	if (isDiseased) {
 		int random = 1 + (rand() % 2);
+		//either hurt them or slow them down
 		if (random == 1)
 			updateHealth(health - .05);
 		if (random == 2)

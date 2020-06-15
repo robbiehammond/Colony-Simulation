@@ -6,7 +6,6 @@ Colony::Colony(sf::Color _color)
 	color = _color;
 }
 
-//unfortunately, SFML colors don't seem to have any built-in way to convert their values into basic strings
 string Colony::to_string()
 {
 	if (color == sf::Color::Red)
