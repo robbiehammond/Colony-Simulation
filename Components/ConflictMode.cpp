@@ -505,7 +505,7 @@ void ConflictMode::spawnAnimal()
 		int randomX = 1 + (rand() % 1250); 
 		int randomY = 1 + (rand() % 690);
 		fillAr(randomX, randomY, _otherCol);
-		updateStatusBar(bar, "An Vicious Animal Has Spawned!");
+		updateStatusBar(bar, "A Vicious Animal Has Spawned!");
 	}
 }
 
@@ -722,7 +722,7 @@ void ConflictMode::playGame()
 		sf::Text text;
 		text.setFont(font);
 		text.setString(declareWinner()); 
-		text.setPosition(600, 300); //this is off center, fix this 
+		text.setPosition(520, 300); //this is off center, fix this 
 		text.setCharacterSize(30);
 		text.setFillColor(sf::Color::White);
 		while (elapsed_time.asSeconds() < 5) {

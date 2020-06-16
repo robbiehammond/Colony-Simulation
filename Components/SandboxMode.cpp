@@ -67,11 +67,6 @@ void SandboxMode::moveNode(Person& prim, Person& closest)
 	if (dist != 0 && dist < 1000 && prim.myCol.color != closest.myCol.color) {
 		moveTowardNode(prim, closest);
 	}
-	//otherwise, just go to the center 
-	else
-	{
-		prim.moveToCenter();
-	}
 }
 
 

@@ -27,6 +27,7 @@ public:
 
 	//main game function 
 	void playGame();
+
 private:
 	ExitButton button;
 	sf::RenderWindow& window;
