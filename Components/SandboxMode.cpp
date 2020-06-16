@@ -109,6 +109,7 @@ void SandboxMode::getUserInput(sf::RenderWindow& window, sf::Event& event)
 		window.close();
 	}
 
+	//don't allow the number of people on the board to exceed 500
 	if (ar.size() <= 500) {
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{

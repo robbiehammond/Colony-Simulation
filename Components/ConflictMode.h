@@ -9,9 +9,23 @@ enum Weather {
 	NoWeather
 };
 
+struct StatusBar {
+	StatusBar(sf::RenderWindow& _window, sf::Font& _font);
+	sf::RectangleShape outline;
+	sf::RenderWindow& window;
+	sf::Font& font;
+	sf::Text displayedText;
+};
+
 class ConflictMode : public GameMode {
 public:
 	ConflictMode(sf::RenderWindow& _window, sf::Font& _font, Map _map);
+
+	//logic to put the status bar on the screen
+	void drawStatusBar(StatusBar& s);
+
+	//logic to update it with events
+	void updateStatusBar(StatusBar& bar, string s);
 
 	//fills the name array from the name file 
 	void fillNameArray();

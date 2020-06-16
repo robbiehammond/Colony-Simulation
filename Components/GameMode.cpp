@@ -1,6 +1,7 @@
 #include "GameMode.h"
 #include <iostream>
 
+
 //because SFML has no built in toString function
 string GameMode::sfColorToString(sf::Color color)
 {
@@ -112,18 +113,6 @@ void GameMode::removeAndShuffle(sf::Time& elapsed_time)
 	}
 }
 
-//logic to put the status bar on the screen
-void GameMode::drawStatusBar(StatusBar& s)
-{
-	s.window.draw(s.outline);
-	s.window.draw(s.displayedText);
-}
-
-//logic to update it with events
-void GameMode::updateStatusBar(StatusBar& bar, string s)
-{
-	bar.displayedText.setString(s);
-}
 
 
 //put the exit button on the screen
@@ -133,20 +122,6 @@ void GameMode::drawExitButton(ExitButton& button)
 	button.window.draw(button.closeText);
 }
 
-//StatusBar constructor implementation
-StatusBar::StatusBar(sf::RenderWindow& _window, sf::Font& _font)
-	: outline(sf::Vector2f(450, 25)), window(_window), font(_font)
-{
-	outline.setPosition(sf::Vector2f(415, 0));
-	outline.setFillColor(sf::Color::Black);
-	outline.setOutlineColor(sf::Color::White);
-	outline.setOutlineThickness(2);
-
-	displayedText.setPosition(415, 0);
-	displayedText.setFont(font);
-	displayedText.setCharacterSize(20);
-	displayedText.setString("Place your 4 spawners where you'd like");
-}
 
 //ExitButton constructor 
 ExitButton::ExitButton(sf::RenderWindow& _window, sf::Font& _font)

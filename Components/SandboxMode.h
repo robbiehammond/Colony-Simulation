@@ -22,7 +22,7 @@ public:
 	//algorithm controlling most of what happens on the screen
 	void updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time);
 
-	//TODO - move this to GameMode file!
+	//detect when the exit button has been clicked
 	bool detectExitClick(ExitButton button);
 
 	//main game function 

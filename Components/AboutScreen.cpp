@@ -4,9 +4,13 @@ AboutScreen::AboutScreen(sf::RenderWindow& _window, sf::Font& _font)
 	: window(_window), font(_font)
 {
 	//the actual string that shows on the screen
-	text.setString("The goal of this project was not to do anything groundbreaking, but just to have fun and sharpen my C++ skills a bit.\n"
-					"Certain aspects of this project could certainly be improved on (ie the searching algorithm), but overall everything works\n"
-					"as I wanted to.\n"); 
+	text.setString("The goal of this project was not to do anything groundbreaking or exceptionally difficult, but just to have fun and \n"
+					"sharpen my C++ OOP skills a bit. Certain aspects of this project could certainly be improved on (ie the searching algorithm),\n"
+					"but overall everything works as I wanted to.\n\n\n\n"
+					"To play, on Sandbox mode, use the controls of your mouse (right click, middle click, left click, to place people of\n"
+					"different colonies, and watch them fight each other!\n\n\n"
+					"For Conflict Mode, place down 4 spawners by left clicking, then sit back and watch people spawn and fight! The last\n"
+					"colony standing is declared the winner."); 
 	text.setFont(font);
 	text.setCharacterSize(20);
 	displayScreen();

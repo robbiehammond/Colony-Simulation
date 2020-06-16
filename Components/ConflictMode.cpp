@@ -52,7 +52,32 @@ ConflictMode::ConflictMode(sf::RenderWindow& _window, sf::Font& _font, Map _map)
 	fillNameArray();
 	playGame();
 	weather = NoWeather;
+}
 
+void ConflictMode::drawStatusBar(StatusBar& s)
+{
+	s.window.draw(s.outline);
+	s.window.draw(s.displayedText);
+}
+
+void ConflictMode::updateStatusBar(StatusBar& bar, string s)
+{
+	bar.displayedText.setString(s);
+}
+
+//StatusBar constructor implementation
+StatusBar::StatusBar(sf::RenderWindow& _window, sf::Font& _font)
+	: outline(sf::Vector2f(450, 25)), window(_window), font(_font)
+{
+	outline.setPosition(sf::Vector2f(415, 0));
+	outline.setFillColor(sf::Color::Black);
+	outline.setOutlineColor(sf::Color::White);
+	outline.setOutlineThickness(2);
+
+	displayedText.setPosition(415, 0);
+	displayedText.setFont(font);
+	displayedText.setCharacterSize(20);
+	displayedText.setString("Place your 4 spawners where you'd like");
 }
 
 void ConflictMode::fillNameArray()

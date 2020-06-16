@@ -10,13 +10,7 @@ enum Mode {
 };
 
 //probably would make the most sense to move this to conflict mode, since it doesn't appear at all in sandbox mode
-struct StatusBar {
-	StatusBar(sf::RenderWindow& _window, sf::Font& _font);
-	sf::RectangleShape outline;
-	sf::RenderWindow& window;
-	sf::Font& font;
-	sf::Text displayedText;
-};
+
 
 struct ExitButton {
 	ExitButton(sf::RenderWindow& _window, sf::Font& _font);
@@ -30,6 +24,7 @@ struct ExitButton {
 //abstract class that holds stuff that all game modes share goes here
 class GameMode {
 public:
+
 	//because SFML has no built in toString function
 	string sfColorToString(sf::Color color);
 
@@ -39,10 +34,6 @@ public:
 
 	//function that returns a value for if a node was found 
 	bool findHardClose(Person& prim);
-
-	//MOVE TO CONFLICT WITH THE STATUSBAR STRUCT
-	void drawStatusBar(StatusBar& s);
-	void updateStatusBar(StatusBar& bar, string s);
 
 	//void detectExitClick(ExitButton button);
 	void drawExitButton(ExitButton& button);
@@ -62,6 +53,7 @@ public:
 	virtual void playGame() = 0;
 	virtual void moveNode(Person& prim, Person& closest) = 0;
 
+	//vector hold hold the people placed on the screen
 	vector<Person> ar;
 
 };
