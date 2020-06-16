@@ -1,13 +1,13 @@
 # Colony Simulator
-Colony Simulator is a program in which you can placed down small circles, which represent people, that fight each other by coming into contact. 
+Colony Simulator is a program in which you can placed down small circles, which represent people, that fight by coming into contact with each other. 
 
 # Simulation Modes
 ### Conflict Mode
 - Place rectangles down in which people can spawn from
 - People attempt to attack the other spawners in an attempt to eliminate the other groups
-- Effects such and wind and animals (represented by large white circles) can strongly influence the outcome 
-- Includes status bar that highlights important game events (animal spawns, wind direction change, colony deaths, etc)
-- Has mechanics for generating/spreading disease among a colony, in addition to mutation mechanics to get stronger/faster
+- Effects such as animals (represented by large white circles) and wind can strongly influence the outcome 
+- Includes a status bar that highlights important game events (animal spawns, wind direction change, colony deaths, etc)
+- Has mechanics for generating/spreading disease among a colony, in addition to mutation mechanics for people to get stronger/faster
 
 ![Conflict Mode Demo](https://github.com/robbiehammond/Simulation/blob/master/GIF%20demos/conflict.gif)
 
