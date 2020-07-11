@@ -24,7 +24,6 @@ bool yellowDeathMessageDisplayed = false;
 
 bool aliveCols[] = { 1, 1, 1, 1 }; //everyone starts out alive 
 
-//make hashmap to store indexes of colonies and the colonies 
 
 //animals
 Colony _otherCol(sf::Color::White);
@@ -405,7 +404,7 @@ void ConflictMode::findSpawner(Person& prim)
 
 void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 {
-	//flags that check on every time this function is called if each colony is still alive 
+	//flags that check on every time this function is called if one person from colony is still alive 
 	bool redCurAlive = false;
 	bool greenCurAlive = false;
 	bool blueCurAlive = false;
@@ -452,7 +451,7 @@ void ConflictMode::updateNodes(sf::RenderWindow& window, sf::Time& elapsed_time)
 		greenColAlive = greenCurAlive;
 		blueColAlive = blueCurAlive;
 		yellowColAlive = yellowCurAlive;
-		checkIfColonyIsAlive();
+		checkIfColonyIsAlive(); //check if any colony has been entirely wiped out (everyone is dead and their spawner is removed too)
 
 		//check for a victory and decide weather conditions each second 
 		if (elapsed_time.asMilliseconds() % 1000 == 0) {
