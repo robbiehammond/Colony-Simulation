@@ -24,6 +24,8 @@ bool yellowDeathMessageDisplayed = false;
 
 bool aliveCols[] = { 1, 1, 1, 1 }; //everyone starts out alive 
 
+//make hashmap to store indexes of colonies and the colonies 
+
 //animals
 Colony _otherCol(sf::Color::White);
 
