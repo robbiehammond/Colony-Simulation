@@ -1,5 +1,6 @@
 # Colony Simulator
-Colony Simulator is a program in which you can placed down small circles, which represent people, that fight by coming into contact with each other. 
+Colony Simulator is a program in which you can placed down small circles, which represent people, that fight by coming into contact with each other.
+To Use, download the release and run the .exe file. Must be on windows with the MSVC compiler.
 
 # Simulation Modes
 ### Conflict Mode
