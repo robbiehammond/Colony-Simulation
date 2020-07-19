@@ -64,7 +64,6 @@ void ConflictMode::updateStatusBar(StatusBar& bar, string s)
 	bar.displayedText.setString(s);
 }
 
-//StatusBar constructor implementation
 StatusBar::StatusBar(sf::RenderWindow& _window, sf::Font& _font)
 	: outline(sf::Vector2f(450, 25)), window(_window), font(_font)
 {
@@ -131,7 +130,6 @@ void ConflictMode::setSpawnPoints()
 		}
 }
 
-//find any node that is relatively close
 Person& ConflictMode::findClose(Person& prim)
 {
 	Person placeholder(-10000, -100000, prim.myCol, prim.curMap);
@@ -199,7 +197,6 @@ void ConflictMode::mutate(Person& person)
 	}
 }
 
-//function the decide of a spawner of another color is close
 bool ConflictMode::otherSpawnerClose(Person& prim)
 {
 	int x = prim.shape.getPosition().x;
